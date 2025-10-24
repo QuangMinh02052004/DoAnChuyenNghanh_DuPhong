@@ -1,0 +1,343 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = Bloomie
+build_property.RootNamespace = Bloomie
+build_property.ProjectDir = /Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie
+build_property._RazorSourceGeneratorDebug = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminCategory/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5DYXRlZ29yeS9BZGQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminCategory/AssignSubCategories.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5DYXRlZ29yeS9Bc3NpZ25TdWJDYXRlZ29yaWVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminCategory/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5DYXRlZ29yeS9EZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminCategory/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5DYXRlZ29yeS9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminCategory/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5DYXRlZ29yeS9VcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminDashboard/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5EYXNoYm9hcmQvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminInventory/Adjust.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5JbnZlbnRvcnkvQWRqdXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminInventory/AdvancedReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5JbnZlbnRvcnkvQWR2YW5jZWRSZXBvcnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminInventory/CreateFlowerType.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5JbnZlbnRvcnkvQ3JlYXRlRmxvd2VyVHlwZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminInventory/CreateProduct.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5JbnZlbnRvcnkvQ3JlYXRlUHJvZHVjdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminInventory/DeleteFlowerType.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5JbnZlbnRvcnkvRGVsZXRlRmxvd2VyVHlwZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminInventory/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5JbnZlbnRvcnkvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminInventory/FlowerTypes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5JbnZlbnRvcnkvRmxvd2VyVHlwZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminInventory/History.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5JbnZlbnRvcnkvSGlzdG9yeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminInventory/ImportFlower.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5JbnZlbnRvcnkvSW1wb3J0Rmxvd2VyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminInventory/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5JbnZlbnRvcnkvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminInventory/LowStock.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5JbnZlbnRvcnkvTG93U3RvY2suY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminInventory/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5JbnZlbnRvcnkvVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminOrder/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5PcmRlci9EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminOrder/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5PcmRlci9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminProduct/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Qcm9kdWN0L0FkZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminProduct/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Qcm9kdWN0L0RlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminProduct/Display.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Qcm9kdWN0L0Rpc3BsYXkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminProduct/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Qcm9kdWN0L0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminProduct/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Qcm9kdWN0L1VwZGF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminPromotion/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Qcm9tb3Rpb24vQWRkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminPromotion/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Qcm9tb3Rpb24vRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminPromotion/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Qcm9tb3Rpb24vSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminPromotion/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Qcm9tb3Rpb24vVXBkYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminRevenue/GetRevenue.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5SZXZlbnVlL0dldFJldmVudWUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminRevenue/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5SZXZlbnVlL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminRole/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Sb2xlL0FkZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminRole/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Sb2xlL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminRole/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Sb2xlL1VwZGF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminShipping/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5TaGlwcGluZy9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminSupplier/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5TdXBwbGllci9BZGQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminSupplier/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5TdXBwbGllci9EZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminSupplier/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5TdXBwbGllci9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminSupplier/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5TdXBwbGllci9VcGRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminUser/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Vc2VyL0FkZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminUser/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Vc2VyL0RlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminUser/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Vc2VyL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/AdminUser/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQWRtaW5Vc2VyL1VwZGF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/Shared/_AdminLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvU2hhcmVkL19BZG1pbkxheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Admin/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Staff/Views/Shared/_StaffLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvU3RhZmYvVmlld3MvU2hhcmVkL19TdGFmZkxheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Staff/Views/StaffDashboard/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvU3RhZmYvVmlld3MvU3RhZmZEYXNoYm9hcmQvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Staff/Views/StaffOrder/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvU3RhZmYvVmlld3MvU3RhZmZPcmRlci9EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Staff/Views/StaffOrder/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvU3RhZmYvVmlld3MvU3RhZmZPcmRlci9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Staff/Views/StaffRating/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvU3RhZmYvVmlld3MvU3RhZmZSYXRpbmcvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Staff/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvU3RhZmYvVmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Areas/Staff/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvU3RhZmYvVmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Account/ForgotPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Gb3Jnb3RQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Mb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Account/NewPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9OZXdQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Account/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Qcm9maWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9SZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Account/SetNewPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9TZXROZXdQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Account/UpdateAccount.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9VcGRhdGVBY2NvdW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Order/Checkout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3JkZXIvQ2hlY2tvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Order/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3JkZXIvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Order/History.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3JkZXIvSGlzdG9yeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Order/OrderConfirmation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3JkZXIvT3JkZXJDb25maXJtYXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Order/PaymentCallBack.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3JkZXIvUGF5bWVudENhbGxCYWNrLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Product/Display.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUHJvZHVjdC9EaXNwbGF5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Product/ImageSearchResults.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUHJvZHVjdC9JbWFnZVNlYXJjaFJlc3VsdHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Product/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUHJvZHVjdC9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL0Vycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Shared/_CategoryMenu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19DYXRlZ29yeU1lbnUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Shared/_IdentityLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19JZGVudGl0eUxheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Shared/_LoginPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19Mb2dpblBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/ShoppingCart/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hvcHBpbmdDYXJ0L0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-te3mrtdwnb

@@ -1,0 +1,6 @@
+Đổi server : trong file appsetting.json: Server=localhost,1433;Database=Bloomie;User Id=sa;Password=Minhlion02052004;TrustServerCertificate=True
+xóa Migration và tạo lại :  dotnet ef migrations add InitialCreate
+                            dotnet ef database update
+ 
+
+Test lại các chức năng
