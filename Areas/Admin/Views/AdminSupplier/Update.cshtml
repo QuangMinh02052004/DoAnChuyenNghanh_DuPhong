@@ -1,0 +1,209 @@
+﻿@model Bloomie.Models.Entities.Supplier
+
+@{
+    ViewData["Title"] = "Cập nhật nhà cung cấp";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid mt-2 p-0">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-dark">
+                    <i class="fas fa-edit text-primary me-2"></i> Sửa nhà cung cấp
+                </h2>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Quay lại
+                </a>
+            </div>
+
+            <!-- Success/Error Messages -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@ViewData["ErrorMessage"]</div>
+            }
+
+            <!-- Update Form -->
+            <form asp-action="Update" method="post">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="Name" class="form-label fw-semibold">Tên nhà cung cấp</label>
+                    <input asp-for="Name" class="form-control" required />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Phone" class="form-label fw-semibold">Số điện thoại</label>
+                    <input asp-for="Phone" class="form-control" required pattern="^[0-9]{10,11}$" title="Số điện thoại phải có 10 hoặc 11 chữ số" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Email" class="form-label fw-semibold">Email</label>
+                    <input asp-for="Email" class="form-control" type="email" required />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Address" class="form-label fw-semibold">Địa chỉ</label>
+                    <input asp-for="Address" class="form-control" required />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label asp-for="IsActive" class="form-label fw-semibold">Trạng thái</label>
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" type="checkbox" id="isActive" />
+                        <label class="form-check-label" for="isActive">
+                            @(Model.IsActive ? "Hoạt động" : "Ngừng hoạt động")
+                        </label>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save me-2"></i> Cập nhật
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i> Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #60a5fa;
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+        --text-muted: #6b7280;
+    }
+
+    h2 {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .form-label {
+        font-size: 0.9rem;
+        color: var(--text-dark);
+    }
+
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        font-size: 0.9rem;
+        padding: 8px 12px;
+        transition: border-color 0.2s ease;
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+    .form-check-input {
+        width: 1.2rem;
+        height: 1.2rem;
+        margin-top: 0.15rem;
+    }
+
+    .form-check-label {
+        font-size: 0.9rem;
+        color: var(--text-dark);
+    }
+
+    .btn-warning, .btn-secondary {
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-warning {
+        background-color: #f59e0b;
+        border-color: #f59e0b;
+    }
+
+        .btn-warning:hover {
+            background-color: #d97706;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-secondary {
+        background-color: #6b7280;
+        border-color: #6b7280;
+    }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .alert {
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+
+    .text-danger {
+        font-size: 0.85rem;
+        margin-top: 4px;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Cập nhật nhãn trạng thái khi checkbox thay đổi
+        document.getElementById("isActive").addEventListener("change", function () {
+            var label = this.nextElementSibling;
+            label.textContent = this.checked ? "Hoạt động" : "Ngừng hoạt động";
+        });
+
+        // Validation phía client
+        document.querySelector("form").addEventListener("submit", function (event) {
+            var name = document.querySelector("input[name='Name']").value.trim();
+            var phone = document.querySelector("input[name='Phone']").value.trim();
+            var email = document.querySelector("input[name='Email']").value.trim();
+            var address = document.querySelector("input[name='Address']").value.trim();
+
+            if (!name || !phone || !email || !address) {
+                event.preventDefault();
+                alert("Vui lòng điền đầy đủ thông tin!");
+            }
+        });
+    </script>
+}

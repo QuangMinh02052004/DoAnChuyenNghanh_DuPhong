@@ -1,0 +1,1440 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Bloomie</title>
+    <link rel="icon" type="image/png" href="/images/BloomieFavicon.png" sizes="32x32" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        /* === Reset CSS === */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* === General Styles === */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #fff;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* === Top Bar === */
+        .top-bar {
+            background: #F5A623;
+            color: #fff;
+            padding: 5px 15px;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .top-bar a {
+                color: #fff;
+                text-decoration: none;
+            }
+
+                .top-bar a:hover {
+                    text-decoration: underline;
+                }
+
+            .top-bar .language-selector img {
+                width: 20px;
+                height: 20px;
+                margin-left: 5px;
+            }
+
+        /* === Header === */
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+            .header-brand img {
+                height: 100px; 
+                width: auto;
+                object-fit: cover;
+                border-radius: 50%;
+            }
+
+            .header-brand .tagline {
+                font-family: 'Roboto', sans-serif;
+                font-size: 1.1rem;
+                color: #D0021B;
+                font-weight: 700;
+            }
+
+        .header-search {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 25px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 6px 12px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            max-width: 450px;
+            width: 100%;
+        }
+
+            .search-bar:focus-within {
+                border-color: #D0021B;
+                box-shadow: 0 0 10px rgba(208, 2, 27, 0.3);
+            }
+
+            .search-bar input[type="text"] {
+                border: none;
+                background: transparent;
+                font-size: 1rem;
+                color: #333;
+                outline: none;
+                flex: 1;
+                font-family: 'Roboto', sans-serif;
+            }
+
+            .search-bar input[type="file"] {
+                display: none;
+            }
+
+            .search-bar button {
+                background: transparent;
+                border: none;
+                color: #D0021B;
+                font-size: 1.2rem;
+                cursor: pointer;
+                transition: color 0.3s ease;
+                padding: 0 8px;
+            }
+
+                .search-bar button:hover {
+                    color: #F5A623;
+                }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .action-btn {
+            background: transparent;
+            color: #333;
+            font-weight: 700;
+            border-radius: 5px;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            height: 38px;
+            line white-space: nowrap;
+            gap: 6px;
+        }
+
+            .action-btn:hover {
+                color: #D0021B;
+            }
+
+            .action-btn i {
+                font-size: 1.1rem;
+            }
+
+            .action-btn .badge {
+                font-size: 0.75rem;
+                padding: 3px 6px;
+                border-radius: 12px;
+                top: -8px;
+                right: -10px;
+                background-color: #D0021B;
+                color: #fff;
+            }
+
+        .login-partial {
+            display: flex;
+            align-items: center;
+            height: 38px;
+            line-height: 1;
+        }
+
+            .login-partial a {
+                text-decoration: none;
+            }
+
+            .login-partial .dropdown-toggle {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+            }
+
+                .login-partial .dropdown-toggle:hover {
+                    color: #D0021B;
+                }
+
+        .dropdown-item .logout-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 0;
+            margin-right: 6px; /* Khoảng cách giữa biểu tượng và chữ "Đăng xuất" */
+        }
+
+            .dropdown-item .logout-icon i {
+                font-size: 1.1rem;
+                margin-right: -2px; /* Kéo sát biểu tượng với dấu ] */
+            }
+
+        .dropdown-item .dropdown-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 0;
+            margin-right: 6px;
+        }
+
+            .dropdown-item .dropdown-icon i {
+                font-size: 1.1rem;
+                margin-right: -2px;
+            }
+
+        /* === Main Navigation === */
+        .main-nav {
+            background: #fff;
+            padding: 12px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ để làm nổi */
+            border-bottom: 1px solid #ddd; /* Đường viền dưới */
+            border-top: 1px solid #ddd; /* Đường viền trên */
+            position: relative; /* Đảm bảo z-index hoạt động nếu cần */
+            z-index: 900; /* Đặt z-index thấp hơn header-top nhưng cao hơn nội dung */
+        }
+
+            .main-nav .navbar-nav {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                gap: 20px;
+                flex-wrap: wrap;
+                margin: 0;
+                padding: 0;
+            }
+
+            .main-nav .nav-item {
+                position: relative;
+                list-style: none;
+            }
+
+            .main-nav .nav-link {
+                color: #333 !important;
+                font-weight: 700;
+                font-size: 0.95rem;
+                padding: 8px 15px !important;
+                text-transform: uppercase;
+                transition: color 0.3s ease;
+                white-space: nowrap;
+            }
+
+                .main-nav .nav-link:hover {
+                    color: #D0021B !important;
+                }
+
+                .main-nav .nav-link.active {
+                    color: #D0021B !important;
+                }
+
+            .main-nav .dropdown-menu {
+                background: #fff;
+                border: none;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                padding: 8px 0;
+                margin-top: 0;
+                border-radius: 8px;
+                position: absolute;
+                z-index: 1000;
+                display: none;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(10px);
+                transition: all 0.3s ease;
+            }
+
+            .main-nav .nav-item.dropdown:hover .dropdown-menu {
+                display: block;
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .main-nav .dropdown-item {
+                color: #333;
+                font-weight: 700;
+                font-size: 0.9rem;
+                padding: 8px 25px;
+                transition: all 0.3s ease;
+            }
+
+                .main-nav .dropdown-item:hover {
+                    background: #f5f5f5;
+                    color: #D0021B;
+                }
+
+                .main-nav .dropdown-item.active {
+                    color: #D0021B !important;
+                    background: #f5f5f5;
+                }
+
+        /* === Divider === */
+        hr.divider {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 0;
+            max-width: 1500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* === Main Content === */
+        main {
+            flex: 1 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1500px;
+            padding-left: 20px;
+            padding-right: 20px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .main-content {
+            background: #fff;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            margin-top: 0;
+        }
+
+        /* === Carousel Banner === */
+        #promoCarousel {
+            width: 100%;
+            background: #fff;
+            overflow: hidden;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .carousel-item {
+            height: 450px;
+            position: relative;
+            background-color: #f5f5f5;
+        }
+
+        .carousel-media {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 10px;
+        }
+
+            .carousel-media[src$=".gif"] {
+                background-color: transparent;
+            }
+
+        .carousel-caption {
+            position: absolute;
+            bottom: 25px;
+            left: 25px;
+            right: 25px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: left;
+            animation: slideUp 0.5s ease-out;
+        }
+
+            .carousel-caption h5 {
+                font-family: 'Roboto', sans-serif;
+                font-size: 1.6rem;
+                margin-bottom: 6px;
+            }
+
+            .carousel-caption p {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+
+            .carousel-caption .btn {
+                background: #D0021B;
+                color: #fff;
+                border: none;
+                padding: 8px 18px;
+                border-radius: 5px;
+                font-size: 0.95rem;
+                transition: background 0.3s ease;
+            }
+
+                .carousel-caption .btn:hover {
+                    background: #F5A623;
+                }
+
+        .carousel-inner {
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .carousel-indicators [data-bs-target] {
+            background-color: #ddd;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 6px;
+        }
+
+        .carousel-indicators .active {
+            background-color: #D0021B;
+        }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+        }
+
+        .carousel-control-prev:hover .carousel-control-prev-icon,
+        .carousel-control-next:hover .carousel-control-next-icon {
+            background-color: #D0021B;
+        }
+
+        /* === Category Section === */
+        .category-section {
+            padding: 20px 0;
+            margin-bottom: 25px;
+        }
+
+            .category-section h2 {
+                font-family: 'Roboto', sans-serif;
+                font-size: 2.2rem;
+                font-weight: 700;
+                color: #D0021B;
+                margin-bottom: 20px;
+                text-align: center;
+                position: relative;
+            }
+
+                .category-section h2::after {
+                    content: '';
+                    width: 80px;
+                    height: 4px;
+                    background: #D0021B;
+                    position: absolute;
+                    bottom: -8px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            justify-items: center;
+        }
+
+        .category-item {
+            text-align: center;
+        }
+
+        .category-img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .category-item:hover .category-img {
+            transform: scale(1.05);
+        }
+
+        .category-item h3 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+
+        /* === Product Section === */
+        .product-section {
+            padding: 50px 0;
+        }
+
+            .product-section h2 {
+                font-family: 'Roboto', sans-serif;
+                font-size: 2.2rem;
+                font-weight: 700;
+                color: #D0021B;
+                margin-bottom: 35px;
+                text-align: center;
+                position: relative;
+            }
+
+                .product-section h2::after {
+                    content: '';
+                    width: 80px;
+                    height: 4px;
+                    background: #D0021B;
+                    position: absolute;
+                    bottom: -12px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+            justify-content: center;
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            min-height: 460px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+            .product-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .product-card img {
+                width: 100%;
+                height: 230px;
+                object-fit: cover;
+                margin-bottom: 15px;
+                border-radius: 10px;
+            }
+
+            .product-card h3 {
+                font-family: 'Roboto', sans-serif;
+                font-size: 1.3rem;
+                font-weight: 700;
+                margin-bottom: 10px;
+                color: #333;
+                height: 50px;
+                line-height: 1.2;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+            }
+
+            .product-card .price {
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: #D0021B;
+                margin-bottom: 15px;
+                flex-grow: 0;
+            }
+
+            .product-card .promo-badge {
+                position: absolute;
+                top: 15px;
+                left: 15px;
+                background: #D0021B;
+                color: #fff;
+                font-size: 0.8rem;
+                padding: 5px 10px;
+                border-radius: 5px;
+                z-index: 1;
+            }
+
+            .product-card .btn {
+                background: #D0021B;
+                color: #fff;
+                font-weight: 700;
+                padding: 10px 20px;
+                border-radius: 5px;
+                transition: all 0.3s ease;
+                width: 100%;
+                flex-grow: 0;
+                font-family: 'Roboto', sans-serif;
+                margin-bottom: 8px;
+            }
+
+                .product-card .btn:hover {
+                    background: #F5A623;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+                }
+
+            .product-card .quick-view {
+                background: #f5f5f5;
+                color: #333;
+                font-weight: 700;
+                padding: 8px 15px;
+                border-radius: 5px;
+                transition: all 0.3s ease;
+                width: 100%;
+                flex-grow: 0;
+                font-family: 'Roboto', sans-serif;
+            }
+
+                .product-card .quick-view:hover {
+                    background: #ddd;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+                }
+
+        /* === Footer === */
+        .footer {
+            background: #f5f5f5;
+            color: #333;
+            padding: 50px 0 0;
+            margin-top: auto;
+            width: 100%;
+        }
+
+            .footer .container {
+                max-width: 1300px;
+                padding-bottom: 0;
+            }
+
+            .footer .row {
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 25px;
+            }
+
+            .footer h5 {
+                font-family: 'Roboto', sans-serif;
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: #D0021B;
+                margin-bottom: 20px;
+            }
+
+            .footer p, .footer a {
+                font-size: 0.95rem;
+                color: #333;
+                transition: color 0.3s ease;
+                font-family: 'Roboto', sans-serif;
+            }
+
+                .footer a:hover {
+                    color: #D0021B !important;
+                }
+
+            .footer .text-muted {
+                color: #666 !important;
+            }
+
+            .footer .text-warning {
+                color: #D0021B !important;
+            }
+
+                .footer .text-warning:hover {
+                    color: #F5A623 !important;
+                }
+
+        .footer-col {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .footer-links ul li {
+                margin-bottom: 10px;
+            }
+
+                .footer-links ul li a {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    text-decoration: none;
+                }
+
+        .social-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .social-btn {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #333;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+
+            .social-btn img {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .social-btn:hover {
+                background-color: #f5f5f5;
+                color: #333;
+            }
+
+        .newsletter-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            max-width: 320px;
+        }
+
+            .newsletter-form input {
+                flex: 1;
+                padding: 8px 12px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                background: #fff;
+                font-size: 0.9rem;
+                font-family: 'Roboto', sans-serif;
+                color: #333;
+                outline: none;
+                transition: border-color 0.3s ease;
+            }
+
+                .newsletter-form input:focus {
+                    border-color: #D0021B;
+                }
+
+            .newsletter-form button {
+                background: #D0021B;
+                color: #fff;
+                font-weight: 500;
+                padding: 8px 15px;
+                border: none;
+                border-radius: 5px;
+                font-size: 0.9rem;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+
+                .newsletter-form button:hover {
+                    background: #F5A623;
+                }
+
+        .footer-divider {
+            border-top: 1px solid #ddd;
+            margin: 30px 0;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+            .footer-bottom-links a {
+                font-size: 0.9rem;
+            }
+
+        .footer .text-center {
+            margin-bottom: 0;
+        }
+
+        /* === Camera Modal === */
+        .camera-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+            .camera-modal video, .camera-modal canvas {
+                max-width: 90%;
+                max-height: 70%;
+                border-radius: 10px;
+            }
+
+            .camera-modal .btn {
+                margin: 10px;
+                background: #D0021B;
+                color: #fff;
+                padding: 10px 20px;
+                border-radius: 5px;
+            }
+
+                .camera-modal .btn:hover {
+                    background: #F5A623;
+                }
+
+            .camera-modal img {
+                max-width: 90%;
+                max-height: 70%;
+                border-radius: 10px;
+            }
+
+        /* === Analysis Modal === */
+        .analysis-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+            .analysis-modal img {
+                max-width: 90%;
+                max-height: 60%;
+                border-radius: 10px;
+                border: 2px solid #D0021B;
+            }
+
+            .analysis-modal .loading-text {
+                color: #fff;
+                font-family: 'Roboto', sans-serif;
+                font-size: 1.2rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .analysis-modal .spinner-border {
+                border-color: #D0021B;
+                border-right-color: transparent;
+            }
+
+            .analysis-modal .btn {
+                background: #D0021B;
+                color: #fff;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-family: 'Roboto', sans-serif;
+                font-weight: 700;
+            }
+
+                .analysis-modal .btn:hover {
+                    background: #F5A623;
+                }
+    </style>
+</head>
+
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div>
+            <i class="bi bi-truck me-2"></i>
+            <span>Nơi giao hoa: </span>
+            <a href="#">Hồ Chí Minh city</a>
+        </div>
+        <div class="language-selector">
+            <a href="#"><img src="https://flagcdn.com/16x12/gb.png" alt="English"> English</a>
+        </div>
+    </div>
+
+    <!-- Header: Logo, Search, and Action Buttons -->
+    <header class="header-top">
+        <div class="header-brand">
+            <img src="/images/BloomieLogo.png" alt="Bloomie Flower Shop Logo">
+            <span class="tagline">Tỏa sắc yêu thương</span>
+        </div>
+        <div class="header-search">
+            <form asp-controller="Product" asp-action="Index" method="get" class="search-bar">
+                <input type="text" name="searchString" id="searchInput" placeholder="Tìm kiếm hoa hoặc tải ảnh..." aria-label="Tìm kiếm sản phẩm hoặc tải ảnh" />
+                <input type="file" id="imageFile" accept="image/*" aria-label="Tải hình ảnh lên để tìm kiếm" />
+                <button type="submit" aria-label="Tìm kiếm"><i class="bi bi-search"></i></button>
+                <button type="button" onclick="document.getElementById('imageFile').click()" aria-label="Tải ảnh"><i class="bi bi-upload"></i></button>
+                <button type="button" onclick="openCameraModal()" aria-label="Chụp ảnh"><i class="bi bi-camera"></i></button>
+            </form>
+        </div>
+        <div class="header-actions">
+            <div class="login-partial">
+                @if (User.Identity?.IsAuthenticated ?? false)
+                {
+                    <div class="dropdown">
+                        <a class="dropdown-toggle action-btn" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person"></i> Xin chào, @User.Identity.Name
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                            <li>
+                                <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                    <span class="dropdown-icon"><i class="fas fa-user"></i></span> Tài khoản
+                                </a>
+                            </li>
+                            @if (User.Identity.IsAuthenticated && User.IsInRole("User"))
+                            {
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Order" asp-action="History" aria-label="Xem lịch sử đơn hàng">
+                                        <span class="dropdown-icon"><i class="fas fa-shopping-bag"></i></span> Đơn hàng của bạn
+                                    </a>
+                                </li>
+                            }
+                            <li>
+                                <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+                                    <span class="logout-icon"><i class="fas fa-sign-out-alt"></i></span> Đăng xuất
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <a class="action-btn login-btn" asp-controller="Account" asp-action="Login" aria-label="Đăng nhập hoặc đăng ký">
+                        <span class="login-icon"><i class="fas fa-sign-in-alt"></i></span> Đăng nhập
+                    </a>
+                }
+            </div>
+            <form asp-controller="ShoppingCart" asp-action="Index" method="get">
+                <button class="btn action-btn position-relative" type="submit" aria-label="Xem giỏ hàng">
+                    <i class="bi bi-cart-fill"></i> Giỏ hàng
+                    <span id="cartCount" class="position-absolute badge">
+                        @(ViewData["CartCount"] ?? 0)
+                    </span>
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Camera Modal -->
+    <div class="camera-modal" id="cameraModal">
+        <video id="video" autoplay></video>
+        <canvas id="canvas" style="display: none;"></canvas>
+        <img id="capturedImage" style="display: none;" />
+        <div>
+            <button class="btn" onclick="captureImage()" id="captureBtn">Chụp ảnh</button>
+            <button class="btn" onclick="submitImageFromCamera()" id="submitBtn" style="display: none;">Tìm kiếm</button>
+            <button class="btn" onclick="closeCameraModal()">Đóng</button>
+        </div>
+    </div>
+
+    <!-- Analysis Modal -->
+    <div class="analysis-modal" id="analysisModal">
+        <img id="analysisImage" style="display: none;" />
+        <div class="loading-text">
+            <span>Đang phân tích...</span>
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <button class="btn" onclick="closeAnalysisModal()">Hủy</button>
+    </div>
+
+    <!-- Divider -->
+    <hr class="divider" />
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        @await Html.PartialAsync("_CategoryMenu")
+    </nav>
+
+    <!-- Main Content -->
+    <main role="main" class="pb-5">
+        @if (ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index")
+        {
+            <!-- Carousel Banner -->
+            <div id="promoCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/images/banner1.gif" class="carousel-media" alt="Khuyến mãi hoa tươi" loading="lazy">
+                        <div class="carousel-caption">
+                            <h5>Phục vụ 24/24</h5>
+                            <p>Có dịch vụ giao nhanh trong 60 phút</p>
+                            <a href="#" class="btn">Tìm hiểu ngay</a>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/banner2.gif" class="carousel-media" alt="Bó hoa tùy chỉnh" loading="lazy">
+                        <div class="carousel-caption">
+                            <h5>Bó Hoa Tùy Chỉnh</h5>
+                            <p>Thiết kế bó hoa theo ý thích của bạn</p>
+                            <a href="#" class="btn">Tùy chỉnh ngay</a>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/banner3.gif" class="carousel-media" alt="Hoa sinh nhật" loading="lazy">
+                        <div class="carousel-caption">
+                            <h5>Hoa Sinh Nhật Đẹp</h5>
+                            <p>Gửi lời chúc ý nghĩa với hoa tươi</p>
+                            <a href="#" class="btn">Xem ngay</a>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/banner4.gif" class="carousel-media" alt="Giao hoa tận nơi" loading="lazy">
+                        <div class="carousel-caption">
+                            <h5>Giao Hoa Tận Nơi</h5>
+                            <p>Giao nhanh trong 2 giờ tại TP.HCM</p>
+                            <a href="#" class="btn">Đặt ngay</a>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev" aria-label="Previous slide">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next" aria-label="Next slide">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+
+            <!-- Top danh mục yêu thích -->
+            <div class="container">
+                <section class="category-section">
+                    <h2>MẪU HOA MỚI NĂM 2025</h2>
+                    <div class="category-grid">
+                        <div class="category-item">
+                            <a asp-controller="Product" asp-action="Index" asp-route-categoryId="13">
+                                <img src="/images/hoatinhyeu.webp" alt="Hoa tình yêu" class="category-img" />
+                            </a>
+                            <h3>HOA TÌNH YÊU</h3>
+                        </div>
+                        <div class="category-item">
+                            <a asp-controller="Product" asp-action="Index" asp-route-categoryId="8">
+                                <img src="/images/hoasinhnhat.jpg" alt="Hoa sinh nhật" class="category-img" />
+                            </a>
+                            <h3>HOA SINH NHẬT</h3>
+                        </div>
+                        <div class="category-item">
+                            <a asp-controller="Product" asp-action="Index" asp-route-categoryId="5">
+                                <img src="/images/hoacuoi.jpg" alt="Mẫu hoa mới" class="category-img" />
+                            </a>
+                            <h3>HOA CƯỚI</h3>
+                        </div>
+                        <div class="category-item">
+                            <a asp-controller="Product" asp-action="Index" asp-route-categoryId="10">
+                                <img src="/images/hoachucmung.jpg" alt="Hoa chúc mừng" class="category-img" />
+                            </a>
+                            <h3>HOA CHÚC MỪNG</h3>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        }
+
+        <div class="container">
+            <div class="main-content">
+                @RenderBody()
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <!-- Cột 1: Thông tin công ty -->
+                <div class="footer-col">
+                    <h5>🌸 Bloomie Flower Shop</h5>
+                    <p class="text-muted">Cửa hàng hoa tươi hàng đầu Việt Nam, mang đến những bó hoa ý nghĩa cho mọi dịp đặc biệt.</p>
+                    <p class="mb-1"><i class="bi bi-geo-alt me-2"></i> Trụ sở: 456 Đường Hoa Hồng, Quận 3, TP. HCM</p>
+                    <p class="mb-1"><i class="bi bi-telephone me-2"></i> Hotline: (028) 9876-5432</p>
+                    <p class="mb-1"><i class="bi bi-envelope me-2"></i> Email: bloomieshop25@gmail.vn</p>
+                    <p><i class="bi bi-globe me-2"></i> Website: <a href="https://bloomieshop.vn" target="_blank">bloomieshop.vn</a></p>
+                </div>
+
+                <!-- Cột 2: Hỗ trợ khách hàng -->
+                <div class="footer-col">
+                    <h5>🌺 Hỗ trợ khách hàng</h5>
+                    <div class="footer-links">
+                        <ul>
+                            <li><a asp-controller="Home" asp-action="FAQ"><i class="bi bi-question-circle me-2"></i> Câu hỏi thường gặp</a></li>
+                            <li><a asp-controller="Home" asp-action="Contact"><i class="bi bi-headset me-2"></i> Liên hệ hỗ trợ</a></li>
+                            <li><a asp-controller="Home" asp-action="ShippingPolicy"><i class="bi bi-truck me-2"></i> Chính sách giao hàng</a></li>
+                            <li><a asp-controller="Home" asp-action="ReturnPolicy"><i class="bi bi-arrow-return-left me-2"></i> Chính sách đổi trả</a></li>
+                            <li><a asp-controller="Home" asp-action="PaymentMethods"><i class="bi bi-credit-card me-2"></i> Phương thức thanh toán</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Cột 3: Danh mục sản phẩm -->
+                <div class="footer-col">
+                    <h5>💐 Danh mục sản phẩm</h5>
+                    <div class="footer-links">
+                        <ul>
+                            <li><a asp-controller="Product" asp-action="Index" asp-route-categoryId="1"><i class="bi bi-flower1 me-2"></i> Hoa sinh nhật</a></li>
+                            <li><a asp-controller="Product" asp-action="Index" asp-route-categoryId="2"><i class="bi bi-flower1 me-2"></i> Hoa chúc mừng</a></li>
+                            <li><a asp-controller="Product" asp-action="Index" asp-route-categoryId="3"><i class="bi bi-flower1 me-2"></i> Hoa tình yêu</a></li>
+                            <li><a asp-controller="Product" asp-action="Index" asp-route-categoryId="4"><i class="bi bi-flower1 me-2"></i> Hoa chia buồn</a></li>
+                            <li><a asp-controller="Product" asp-action="Index"><i class="bi bi-flower1 me-2"></i> Xem tất cả</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Cột 4: Thông tin cửa hàng -->
+                <div class="footer-col">
+                    <h5>🌹 Thông tin cửa hàng</h5>
+                    <div class="footer-links">
+                        <ul>
+                            <li><a asp-controller="Home" asp-action="About"><i class="bi bi-info-circle me-2"></i> Về Bloomie</a></li>
+                            <li><a asp-controller="Home" asp-action="StoreLocations"><i class="bi bi-geo-alt me-2"></i> Danh sách cửa hàng</a></li>
+                            <li><a href="https://www.facebook.com/bloomie" target="_blank"><i class="bi bi-facebook me-2"></i> Fanpage Bloomie</a></li>
+                            <li><a asp-controller="Home" asp-action="FlowerMeanings"><i class="bi bi-flower1 me-2"></i> Ý nghĩa các loài hoa</a></li>
+                            <li><a asp-controller="Blog" asp-action="Index"><i class="bi bi-book me-2"></i> Blog về hoa</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Cột 5: Cam kết dịch vụ -->
+                <div class="footer-col">
+                    <h5>💖 Cam kết của chúng tôi</h5>
+                    <div class="footer-links">
+                        <ul>
+                            <li><a><i class="bi bi-check-circle me-2"></i> Hoa tươi 100%, nhập mới mỗi ngày</a></li>
+                            <li><a><i class="bi bi-check-circle me-2"></i> Giao hoa nhanh trong 60 phút</a></li>
+                            <li><a><i class="bi bi-check-circle me-2"></i> Hoàn tiền 100% nếu không hài lòng</a></li>
+                            <li><a><i class="bi bi-check-circle me-2"></i> Hỗ trợ tận tình 24/7</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phần chi nhánh và thông tin bổ sung -->
+            <hr class="footer-divider" />
+            <div class="row">
+                <!-- Cột 1: Chi nhánh -->
+                <div class="footer-col">
+                    <h5>🌟 Chi nhánh Bloomie</h5>
+                    <p><strong>Shop Hoa TP.HCM:</strong> 230B Võ Thị Sáu, P.6, Quận 3 - (028) 1234-5678</p>
+                    <p><strong>Shop Hoa Hà Nội:</strong> 32A Đường 730, Quận Hoàn Kiếm - (024) 8765-4321</p>
+                    <p><strong>Shop Hoa Đà Nẵng:</strong> 45 Nguyễn Văn Linh, Hải Châu - (0236) 456-7890</p>
+                    <p><strong>Shop Hoa Cần Thơ:</strong> 181 Thống Nhất, Ninh Kiều - (0292) 234-5678</p>
+                </div>
+
+                <!-- Cột 2: Giới thiệu -->
+                <div class="footer-col" style="flex: 2;">
+                    <h5>🌷 Giới thiệu về Bloomie</h5>
+                    <p class="text-muted">Bloomie Flower Shop là địa chỉ cung cấp hoa tươi uy tín tại Việt Nam. Chúng tôi tự hào mang đến những bó hoa tinh tế, ý nghĩa, giúp bạn gửi gắm tình cảm trong mọi dịp đặc biệt. Với hệ thống cửa hàng tại TP.HCM, Hà Nội, Đà Nẵng và Cần Thơ, Bloomie luôn sẵn sàng phục vụ bạn với dịch vụ giao hoa nhanh chóng và tận tâm.</p>
+                </div>
+
+                <!-- Cột 3: Theo dõi và đăng ký -->
+                <div class="footer-col">
+                    <h5>🌼 Theo dõi chúng tôi</h5>
+                    <div class="social-links">
+                        <a href="https://www.google.com/bloomie" class="social-btn" aria-label="Instagram">
+                            <img src="https://www.google.com/favicon.ico" alt="Google Logo">
+                            Google
+                        </a>
+                        <a href="https://www.facebook.com/bloomie" class="social-btn" aria-label="Facebook">
+                            <img src="https://www.facebook.com/favicon.ico" alt="Facebook Logo">
+                            Facebook
+                        </a>
+                        <a href="https://www.twitter.com/bloomie" class="social-btn" aria-label="Twitter">
+                            <img src="https://www.twitter.com/favicon.ico" alt="Twitter Logo">
+                            Twitter
+                        </a>
+                    </div>
+                    <div class="newsletter mt-3">
+                        <h5>Đăng ký nhận tin</h5>
+                        <div class="newsletter-form">
+                            <input type="email" placeholder="Email của bạn" aria-label="Email đăng ký nhận tin" required>
+                            <button type="submit" aria-label="Đăng ký nhận tin">Đăng ký</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phần cuối: Chỉ giữ bản quyền -->
+            <hr class="footer-divider" />
+            <div class="text-center">
+                <p class="text-muted mb-0">© 2025 - Bloomie Flower Shop | Tất cả quyền được bảo lưu</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Làm mới hình ảnh carousel trên slide
+        document.addEventListener('DOMContentLoaded', function () {
+            const carousel = document.querySelector('#promoCarousel');
+            if (carousel) {
+                carousel.addEventListener('slide.bs.carousel', function (e) {
+                    const activeSlide = e.relatedTarget;
+                    const img = activeSlide.querySelector('.carousel-media');
+                    if (img) {
+                        img.setAttribute('loading', 'lazy');
+                    }
+                });
+            }
+        });
+
+        // JavaScript để xử lý camera, tải ảnh và phân tích
+        let stream = null;
+        let isImageSearch = false;
+
+        // Mở modal camera
+        function openCameraModal() {
+            const modal = document.getElementById('cameraModal');
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const capturedImage = document.getElementById('capturedImage');
+            const captureBtn = document.getElementById('captureBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            modal.style.display = 'flex';
+            captureBtn.style.display = 'inline-block';
+            submitBtn.style.display = 'none';
+            video.style.display = 'block';
+            canvas.style.display = 'none';
+            capturedImage.style.display = 'none';
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(s => {
+                    stream = s;
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    console.error('Error accessing camera:', err);
+                    alert('Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.');
+                    closeCameraModal();
+                });
+        }
+
+        // Chụp ảnh từ camera
+        function captureImage() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const capturedImage = document.getElementById('capturedImage');
+            const captureBtn = document.getElementById('captureBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            capturedImage.src = canvas.toDataURL('image/jpeg');
+            capturedImage.style.display = 'block';
+            video.style.display = 'none';
+            captureBtn.style.display = 'none';
+            submitBtn.style.display = 'inline-block';
+
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        }
+
+        // Đóng modal camera
+        function closeCameraModal() {
+            const modal = document.getElementById('cameraModal');
+            const video = document.getElementById('video');
+            modal.style.display = 'none';
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            video.srcObject = null;
+        }
+
+        // Đóng modal phân tích
+        function closeAnalysisModal() {
+            const modal = document.getElementById('analysisModal');
+            const analysisImage = document.getElementById('analysisImage');
+            modal.style.display = 'none';
+            analysisImage.src = '';
+            analysisImage.style.display = 'none';
+            isImageSearch = false;
+            document.getElementById('imageFile').value = '';
+            document.getElementById('searchInput').value = '';
+        }
+
+        // Gửi ảnh đến backend (giữ logic gốc, thêm timeout và modal)
+        function submitImage(blob, filename = 'captured-image.jpg', signal) {
+            const modal = document.getElementById('analysisModal');
+            const analysisImage = document.getElementById('analysisImage');
+            analysisImage.src = URL.createObjectURL(blob);
+            analysisImage.style.display = 'block';
+            modal.style.display = 'flex';
+
+            const formData = new FormData();
+            formData.append('imageFile', blob, filename);
+
+            return fetch('/Product/ImageSearch', {
+                method: 'POST',
+                body: formData,
+                signal
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Lỗi server: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response from ImageSearch:', data);
+                    if (data.success) {
+                        window.location.href = data.redirectUrl || `/Product/Index?colors=${encodeURIComponent(data.colors.join(','))}&presentations=${encodeURIComponent(data.presentation)}`;
+                    } else {
+                        alert(data.message || 'Không thể phân tích ảnh. Vui lòng thử lại.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error submitting image:', err);
+                    if (err.name === 'AbortError') {
+                        alert('Timeout: Phân tích ảnh mất quá nhiều thời gian (15 giây). Vui lòng thử lại.');
+                    } else {
+                        alert(err.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+                    }
+                    throw err;
+                })
+                .finally(() => {
+                    closeAnalysisModal();
+                });
+        }
+
+        // Xử lý ảnh chụp từ camera
+        function submitImageFromCamera() {
+            const capturedImage = document.getElementById('capturedImage');
+            const canvas = document.getElementById('canvas');
+            isImageSearch = true;
+            document.getElementById('searchInput').value = 'captured-image.jpg';
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => {
+                controller.abort();
+            }, 15000);
+
+            fetch(canvas.toDataURL('image/jpeg'))
+                .then(res => res.blob())
+                .then(blob => {
+                    submitImage(blob, 'captured-image.jpg', controller.signal).finally(() => {
+                        clearTimeout(timeoutId);
+                        closeCameraModal();
+                    });
+                })
+                .catch(err => {
+                    console.error('Error converting canvas to blob:', err);
+                    alert('Không thể xử lý ảnh chụp. Vui lòng thử lại.');
+                    closeCameraModal();
+                });
+        }
+
+        // Xử lý tìm kiếm và tải ảnh
+        document.getElementById('imageFile').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Kiểm tra kích thước file (<5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Ảnh quá lớn (tối đa 5MB). Vui lòng chọn ảnh nhỏ hơn.');
+                    e.target.value = '';
+                    return;
+                }
+                // Kiểm tra định dạng file
+                if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                    alert('Vui lòng chọn file ảnh định dạng JPG, PNG hoặc WebP.');
+                    e.target.value = '';
+                    return;
+                }
+                isImageSearch = true;
+                document.getElementById('searchInput').value = file.name;
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                }, 15000);
+
+                submitImage(file, file.name, controller.signal).finally(() => clearTimeout(timeoutId));
+            }
+        });
+
+        // Xử lý submit form tìm kiếm text
+        document.querySelector('.search-bar').addEventListener('submit', function (e) {
+            const searchInput = document.getElementById('searchInput');
+            if (isImageSearch || !searchInput.value.trim()) {
+                e.preventDefault();
+            }
+        });
+
+        // Reset isImageSearch khi nhập text mới
+        document.getElementById('searchInput').addEventListener('input', function () {
+            isImageSearch = false;
+            document.getElementById('imageFile').value = '';
+        });
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

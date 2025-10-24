@@ -1,0 +1,255 @@
+﻿@using Bloomie.Models.Entities
+@model IEnumerable<Bloomie.Models.Entities.Order>
+
+@{
+    ViewData["Title"] = "Đơn hàng của tôi";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center fw-bold mb-5" style="color: #D0021B;">
+        <i class="bi bi-file-earmark-text me-2"></i> Đơn hàng của tôi
+    </h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center shadow-sm rounded">
+            <i class="bi bi-exclamation-triangle me-2"></i> Bạn chưa có đơn hàng nào.
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-lg rounded">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background: linear-gradient(90deg, #D0021B, #F5A623); color: #fff;">
+                            <tr>
+                                <th>Mã đơn hàng</th>
+                                <th>Ngày đặt</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th>Chi tiết</th>
+                                <th>Hủy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model)
+                            {
+                                <tr class="align-middle text-center table-row">
+                                    <td class="ps-4 fw-semibold" style="color: #333;">#@order.Id</td>
+                                    <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                    <td class="fw-semibold" style="color: #4CAF50;">@order.TotalPrice.ToString("#,##0") đ</td>
+                                    <td>
+                                        <span class="badge rounded-pill px-3 py-2 @(order.OrderStatus == OrderStatus.Pending ? "bg-warning text-dark" : order.OrderStatus == OrderStatus.Processing ? "bg-secondary" : order.OrderStatus == OrderStatus.Shipped ? "bg-primary" : order.OrderStatus == OrderStatus.Delivered ? "bg-success" : "bg-danger")">
+                                            @Bloomie.Models.Entities.OrderStatusHelper.GetStatusDescription(order.OrderStatus)
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-controller="Order" asp-action="Details" asp-route-orderId="@order.Id" class="btn btn-primary-custom btn-sm shadow-sm">
+                                            <i class="bi bi-eye me-1"></i> Xem chi tiết
+                                        </a>
+                                    </td>
+                                    <td class="pe-4">
+                                        @if (order.OrderStatus == OrderStatus.Pending || order.OrderStatus == OrderStatus.Processing)
+                                        {
+                                            <button class="btn btn-outline-danger btn-sm shadow-sm cancel-order" data-order-id="@order.Id">
+                                                <i class="bi bi-trash me-1"></i> Hủy
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-outline-danger btn-sm shadow-sm" disabled>
+                                                <i class="bi bi-trash me-1"></i> Hủy
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .text-primary {
+        color: #D0021B !important;
+    }
+
+    .text-dark {
+        color: #333 !important;
+    }
+
+    .text-danger {
+        color: #EF4444 !important;
+    }
+
+    .card {
+        border: none;
+        border-radius: 15px;
+        background-color: #FFFFFF;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+    .table {
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #FAFAFA;
+    }
+
+        .table th {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 18px;
+            font-size: 0.95rem;
+            border-bottom: none;
+            text-align: center;
+        }
+
+        .table td {
+            padding: 18px;
+            font-size: 0.95rem;
+            color: #333;
+            line-height: 1.6;
+            border-bottom: 1px solid #E8ECEF;
+        }
+
+    .table-row {
+        transition: background-color 0.3s ease;
+    }
+
+        .table-row:hover {
+            background-color: #F0F4F8;
+        }
+
+    .badge.bg-success {
+        background-color: #4CAF50 !important;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .badge.bg-secondary {
+        background-color: #6C757D !important;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .badge.bg-warning {
+        background-color: #FBBF24 !important;
+        color: #333 !important;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .badge.bg-primary {
+        background-color: #D0021B !important;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .badge.bg-danger {
+        background-color: #EF4444 !important;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .btn-primary-custom {
+        background-color: #60A5FA;
+        border-color: #60A5FA;
+        color: #FFFFFF;
+        padding: 8px 16px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-primary-custom:hover {
+            background-color: #3B82F6;
+            border-color: #3B82F6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+    .btn-outline-danger {
+        background-color: #EF4444;
+        border: none;
+        color: #FFFFFF;
+        padding: 8px 16px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-danger:hover:not(:disabled) {
+            background-color: #DC2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-outline-danger:disabled {
+            background-color: #E9ECEF;
+            color: #6C757D;
+            cursor: not-allowed;
+        }
+
+    .alert-warning {
+        border-radius: 12px;
+        font-size: 1rem;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+        background-color: #FEF3C7;
+        color: #92400E;
+        border: 1px solid #FDE68A;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+</style>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".cancel-order").on("click", function () {
+                const orderId = $(this).data("order-id");
+                if (confirm("❗Bạn có chắc chắn muốn hủy đơn hàng #" + orderId + " không?")) {
+                    $.ajax({
+                        url: "/Order/CancelOrder",
+                        type: "POST",
+                        data: { orderId: orderId },
+                        success: function (response) {
+                            if (response.success) {
+                                // Cập nhật trạng thái trên giao diện
+                                $(`tr:contains('#${orderId}')`).find(".badge")
+                                    .removeClass("bg-warning bg-secondary")
+                                    .addClass("bg-danger")
+                                    .text("Đã hủy");
+                                // Vô hiệu hóa nút hủy
+                                $(`button[data-order-id="${orderId}"]`).replaceWith(
+                                    '<button class="btn btn-outline-danger btn-sm shadow-sm" disabled>' +
+                                    '<i class="bi bi-trash me-1"></i> Hủy' +
+                                    '</button>'
+                                );
+                                alert("Đơn hàng #" + orderId + " đã được hủy thành công!");
+                            } else {
+                                alert("Hủy đơn hàng thất bại: " + response.message);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Lỗi khi hủy đơn hàng:", error);
+                            alert("Đã có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại.");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,246 @@
+﻿@model Bloomie.Models.Entities.Order
+
+@{
+    ViewData["Title"] = "Xác nhận đơn hàng";
+}
+
+<div class="container mt-5 mb-5">
+    <h2 class="text-center mb-5 fw-bold" style="color: #D0021B; letter-spacing: 0.5px;">
+        <i class="bi bi-check-circle-fill me-2"></i> Xác nhận đơn hàng
+    </h2>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger text-center shadow-sm rounded-3 mx-auto" style="max-width: 800px;">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="card shadow-lg rounded-3 p-5 mb-5" style="background: linear-gradient(145deg, #FFFFFF, #F8F9FA);">
+        <div class="card-header bg-transparent border-0">
+            <h3 class="fw-bold mb-0" style="color: #2D3748; font-size: 1.75rem;">
+                Đơn Hàng #@Model.Id
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <h4 class="fw-semibold mb-3" style="color: #2D3748; font-size: 1.25rem; border-bottom: 2px solid #E8ECEF; padding-bottom: 8px;">
+                        Thông tin người gửi
+                    </h4>
+                    <div class="info-group">
+                        <p class="mb-2"><strong class="me-2">Tên:</strong> <span class="text-muted">@(Model.SenderName ?? "Chưa cung cấp")</span></p>
+                        <p class="mb-2"><strong class="me-2">Email:</strong> <span class="text-muted">@(Model.SenderEmail ?? "Chưa cung cấp")</span></p>
+                        <p class="mb-2"><strong class="me-2">Số điện thoại:</strong> <span class="text-muted">@(Model.SenderPhoneNumber ?? "Chưa cung cấp")</span></p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h4 class="fw-semibold mb-3" style="color: #2D3748; font-size: 1.25rem; border-bottom: 2px solid #E8ECEF; padding-bottom: 8px;">
+                        Thông tin người nhận
+                    </h4>
+                    <div class="info-group">
+                        <p class="mb-2"><strong class="me-2">Tên:</strong> <span class="text-muted">@(Model.ReceiverName ?? "Chưa cung cấp")</span></p>
+                        <p class="mb-2"><strong class="me-2">Email:</strong> <span class="text-muted">@(Model.ReceiverEmail ?? "Chưa cung cấp")</span></p>
+                        <p class="mb-2"><strong class="me-2">Số điện thoại:</strong> <span class="text-muted">@(Model.ReceiverPhoneNumber ?? "Chưa cung cấp")</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4" style="border-color: #E8ECEF;">
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <h4 class="fw-semibold mb-3" style="color: #2D3748; font-size: 1.25rem; border-bottom: 2px solid #E8ECEF; padding-bottom: 8px;">
+                        Thông tin giao hàng
+                    </h4>
+                    <div class="info-group">
+                        <p class="mb-2"><strong class="me-2">Ngày đặt hàng:</strong> <span class="text-muted">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</span></p>
+                        <p class="mb-2">
+                            <strong class="me-2">Ngày giao hàng:</strong>
+                            <span class="text-muted">
+                                @(Model.OrderDetails.Any() && Model.OrderDetails.First().DeliveryDate.HasValue ? Model.OrderDetails.First().DeliveryDate.Value.ToString("dd/MM/yyyy") : "Chưa xác định")
+                            </span>
+                        </p>
+                        <p class="mb-2">
+                            <strong class="me-2">Khung giờ giao:</strong>
+                            <span class="text-muted">
+                                    @(Model.OrderDetails.Any() && !string.IsNullOrEmpty(Model.OrderDetails.First().DeliveryTime) ? Model.OrderDetails.First().DeliveryTime : "Chưa xác định")
+                            </span>
+                        </p>
+                        <p class="mb-2"><strong class="me-2">Địa chỉ giao hàng:</strong> <span class="text-muted">@(Model.ShippingAddress ?? "Chưa cung cấp")</span></p>
+                        <p class="mb-2">
+                            <strong class="me-2">Phương thức giao hàng:</strong>
+                            @{
+                                string shippingMethodDisplay = Model.ShippingMethod switch
+                                {
+                                    "Express" => "Giao hàng nhanh",
+                                    _ => Model.ShippingMethod ?? "Chưa xác định"
+                                };
+                            }
+                            <span class="text-muted">@shippingMethodDisplay</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h4 class="fw-semibold mb-3" style="color: #2D3748; font-size: 1.25rem; border-bottom: 2px solid #E8ECEF; padding-bottom: 8px;">
+                        Tóm tắt thanh toán
+                    </h4>
+                    <div class="info-group">
+                        <p class="mb-2"><strong class="me-2">Tổng tiền:</strong> <span style="color: #D0021B; font-weight: 600;">@Model.TotalPrice.ToString("#,##0") đ</span></p>
+                        <p class="mb-2"><strong class="me-2">Trạng thái:</strong> <span style="color: #4CAF50; font-weight: 600;">@Bloomie.Models.Entities.OrderStatusHelper.GetStatusDescription(Model.OrderStatus)</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <h4 class="fw-semibold mt-5 mb-4" style="color: #2D3748; font-size: 1.25rem; border-bottom: 2px solid #E8ECEF; padding-bottom: 8px;">
+                Chi tiết đơn hàng
+            </h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr style="background-color: #F5F7FA; color: #2D3748;">
+                            <th scope="col" class="fw-semibold">Hình ảnh</th>
+                            <th scope="col" class="fw-semibold">Sản phẩm</th>
+                            <th scope="col" class="fw-semibold">Số lượng</th>
+                            <th scope="col" class="fw-semibold">Giá</th>
+                            <th scope="col" class="fw-semibold">Tổng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detail in Model.OrderDetails)
+                        {
+                            <tr class="table-row">
+                                <td class="align-middle">
+                                    @if (!string.IsNullOrEmpty(detail.Product?.ImageUrl))
+                                    {
+                                        <img src="@detail.Product.ImageUrl" alt="@detail.Product.Name" style="max-width: 70px; max-height: 70px; border-radius: 8px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Không có hình ảnh</span>
+                                    }
+                                </td>
+                                <td class="align-middle">@(detail.Product?.Name ?? "Sản phẩm không xác định")</td>
+                                <td class="align-middle">@detail.Quantity</td>
+                                <td class="align-middle">@detail.Price.ToString("#,##0") đ</td>
+                                <td class="align-middle" style="color: #D0021B; font-weight: 600;">@((detail.Price * detail.Quantity).ToString("#,##0")) đ</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+                <a asp-action="History" class="btn btn-primary-custom">
+                    <i class="bi bi-arrow-left me-2"></i>Quay lại danh sách đơn hàng
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-primary {
+        color: #D0021B !important;
+    }
+
+    .card {
+        border: none;
+        border-radius: 15px;
+        background: linear-gradient(145deg, #FFFFFF, #F8F9FA);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        }
+
+    .btn-primary-custom {
+        background-color: #D0021B;
+        border-color: #D0021B;
+        color: #FFFFFF;
+        padding: 12px 28px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+        .btn-primary-custom:hover {
+            background-color: #F5A623;
+            border-color: #F5A623;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+    .alert-danger {
+        border-radius: 12px;
+        font-size: 1rem;
+        padding: 16px 24px;
+        margin-bottom: 30px;
+        background-color: #FFF5F5;
+        color: #721C24;
+        border: 1px solid #F8D7DA;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .table {
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #FFFFFF;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+            padding: 14px;
+            font-size: 0.95rem;
+            border-color: #E8ECEF;
+        }
+
+        .table th {
+            font-weight: 600;
+            background-color: #F5F7FA;
+            border-bottom: 2px solid #E8ECEF;
+            color: #2D3748;
+        }
+
+    .table-row {
+        transition: background-color 0.3s ease;
+    }
+
+        .table-row:hover {
+            background-color: #F7FAFC;
+        }
+
+    .table img {
+        border-radius: 8px;
+        transition: transform 0.3s ease;
+    }
+
+        .table img:hover {
+            transform: scale(1.15);
+        }
+
+    .info-group p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #4A5568;
+    }
+
+    .info-group strong {
+        color: #2D3748;
+        font-weight: 600;
+    }
+
+    hr {
+        border: 0;
+        border-top: 1px solid #E8ECEF;
+        margin: 2rem 0;
+    }
+</style>

@@ -1,0 +1,419 @@
+﻿@model List<Bloomie.Models.Entities.Promotion>
+@{
+    ViewData["Title"] = "Danh sách khuyến mãi";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid mt-2 p-0">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <!-- Header and Add Promotion Button -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-dark">
+                    <i class="fas fa-tags text-primary me-2"></i> Danh sách khuyến mãi
+                </h2>
+                <a asp-action="Add" asp-route-currentPage="@ViewData["CurrentPage"]" class="btn btn-primary btn-sm shadow-sm">
+                    <i class="fas fa-plus me-1"></i> Tạo khuyến mãi
+                </a>
+            </div>
+
+            <!-- Promotion Table -->
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered mb-0">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th class="col-stt">STT</th>
+                            <th class="col-code">Mã khuyến mãi</th>
+                            <th class="col-discount">Phần trăm giảm</th>
+                            <th class="col-status">Trạng thái</th>
+                            <th class="col-applied">Áp dụng cho</th>
+                            <th class="col-min-order">Đơn hàng tối thiểu</th>
+                            <th class="col-max-discount">Giảm tối đa</th>
+                            <th class="col-actions">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int stt = ((int)(ViewData["CurrentPage"] ?? 1) - 1) * (int)(ViewData["PageSize"] ?? 10) + 1;
+                        }
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var promotion in Model)
+                            {
+                                <tr>
+                                    <td>@stt</td>
+                                    <td>@promotion.Code</td>
+                                    <td>@promotion.DiscountPercentage.ToString("0.00")%</td>
+                                    <td>
+                                        @if (promotion != null && promotion.StartDate != null && promotion.EndDate != null)
+                                        {
+                                            @if (promotion.EndDate.Date < DateTime.Now.Date)
+                                            {
+                                                <span class="badge bg-danger">
+                                                    Đã hết hạn
+                                                    <span>(Kết thúc: @promotion.EndDate.ToString("dd/MM/yyyy"))</span>
+                                                </span>
+                                            }
+                                            else if (promotion.StartDate.Date <= DateTime.Now.Date && promotion.EndDate.Date >= DateTime.Now.Date)
+                                            {
+                                                <span class="badge bg-success">Hoạt động</span>
+                                            }
+                                            else
+                                            {
+                                                <div>
+                                                    <span class="badge bg-danger">Không hoạt động</span>
+                                                    @if (promotion.StartDate.Date > DateTime.Now.Date)
+                                                    {
+                                                        <div>(Bắt đầu: @promotion.StartDate.ToString("dd/MM/yyyy"))</div>
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">Dữ liệu không hợp lệ</span>
+                                        }
+                                    </td>
+                                    <td class="applied-cell">
+                                        @if (promotion.PromotionType == Bloomie.Models.Entities.PromotionType.Order)
+                                        {
+                                            <span class="badge bg-info text-dark">Toàn hóa đơn</span>
+                                        }
+                                        else if (promotion.PromotionProducts != null && promotion.PromotionProducts.Any())
+                                        {
+                                            @string.Join(", ", promotion.PromotionProducts.Select(pp => pp.Product?.Name ?? "N/A"))
+                                        }
+                                        else
+                                        {
+                                            <span>Không có sản phẩm</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (promotion.MinimumOrderValue.HasValue)
+                                        {
+                                            @promotion.MinimumOrderValue.Value.ToString("#,##0") <span>đ</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Không giới hạn</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (promotion.MaximumDiscountValue.HasValue)
+                                        {
+                                            @promotion.MaximumDiscountValue.Value.ToString("#,##0") <span>đ</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Không giới hạn</span>
+                                        }
+                                    </td>
+                                    <td class="actions-cell">
+                                        <a asp-action="Update" asp-route-id="@promotion.Id" asp-route-currentPage="@ViewData["CurrentPage"]" class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-title="Sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@promotion.Id" asp-route-currentPage="@ViewData["CurrentPage"]" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa chương trình khuyến mãi này?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                stt++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">Không có chương trình khuyến mãi nào.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            @{
+                int currentPage = (int)(ViewData["CurrentPage"] ?? 1);
+                int totalPages = (int)(ViewData["TotalPages"] ?? 1);
+            }
+            @if (totalPages > 1)
+            {
+                <div class="pagination-section mt-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="pagination-info">
+                            Hiển thị @Model.Count() trong tổng số @(ViewData["TotalItems"] ?? 0) chương trình khuyến mãi
+                        </div>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-end mb-0">
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(currentPage - 1)" aria-label="Previous">
+                                        <span aria-hidden="true">«</span>
+                                    </a>
+                                </li>
+                                @for (int i = 1; i <= totalPages; i++)
+                                {
+                                    <li class="page-item @(i == currentPage ? "active" : "")">
+                                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@i">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(currentPage + 1)" aria-label="Next">
+                                        <span aria-hidden="true">»</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #60a5fa;
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+    }
+
+    h2 {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-warning {
+        background-color: #f59e0b;
+        border-color: #f59e0b;
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        min-width: 32px;
+        transition: all 0.2s ease;
+    }
+
+        .btn-warning:hover {
+            background-color: #d97706;
+            transform: translateY(-1px);
+        }
+
+    .btn-danger {
+        background-color: #ef4444;
+        border-color: #ef4444;
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        min-width: 32px;
+        transition: all 0.2s ease;
+    }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+            transform: translateY(-1px);
+        }
+
+    .table {
+        background-color: #ffffff;
+        border-radius: 8px;
+        table-layout: fixed;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+        .table th, .table td {
+            border-color: #e5e7eb;
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    .col-stt {
+        width: 5%;
+        min-width: 50px;
+    }
+
+    .col-code {
+        width: 10%;
+        min-width: 100px;
+    }
+
+    .col-discount {
+        width: 10%;
+        min-width: 100px;
+    }
+
+    .col-status {
+        width: 15%;
+        min-width: 120px;
+    }
+
+    .col-applied {
+        width: 20%;
+        min-width: 150px;
+    }
+
+    .col-min-order {
+        width: 15%;
+        min-width: 120px;
+    }
+
+    .col-max-discount {
+        width: 15%;
+        min-width: 120px;
+    }
+
+    .col-actions {
+        width: 10%;
+        min-width: 100px;
+    }
+
+    .applied-cell {
+        white-space: normal;
+        overflow-wrap: break-word;
+        max-width: 100%;
+        line-height: 1.4;
+        text-align: left !important;
+    }
+
+    .actions-cell {
+        white-space: nowrap;
+    }
+
+        .actions-cell .btn-sm {
+            margin-right: 4px;
+        }
+
+        .actions-cell .btn-danger {
+            margin-right: 0;
+        }
+
+    .badge.bg-success {
+        background-color: #28a745 !important;
+        color: #fff !important;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+
+    .badge.bg-danger {
+        background-color: #dc3545 !important;
+        color: #fff !important;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+
+    .badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: #212529 !important;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+
+    .badge.bg-info {
+        background-color: #17a2b8 !important;
+        color: #fff !important;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+
+    .pagination-section {
+        padding: 12px 0;
+        background-color: #f8fafc;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .pagination-info {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .pagination .page-link {
+        border-radius: 6px;
+        margin: 0 4px;
+        color: var(--primary-color);
+        border: 1px solid #d1d5db;
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        transition: all 0.2s ease;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: var(--text-light);
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #d1d5db;
+        background-color: #f8fafc;
+        border-color: #d1d5db;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #e5e7eb;
+        border-color: #d1d5db;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    });
+</script>

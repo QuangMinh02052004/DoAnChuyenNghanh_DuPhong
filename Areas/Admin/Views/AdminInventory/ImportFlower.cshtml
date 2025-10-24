@@ -1,0 +1,327 @@
+﻿@model Bloomie.Areas.Admin.Models.ImportInventoryViewModel
+
+@{
+    ViewData["Title"] = "Nhập kho hoa";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid mt-2 p-0">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <!-- Header -->
+            <h2 class="mb-4 fw-bold">
+                <i class="fas fa-plus me-2"></i> Nhập kho - @Model.ProductName
+            </h2>
+
+            <!-- Success/Error Messages -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+            }
+
+            <!-- Form -->
+            <form asp-action="ImportFlower" method="post">
+                <input type="hidden" asp-for="FlowerTypeId" />
+                <input type="hidden" asp-for="ProductName" />
+                <input type="hidden" name="currentPage" value="@ViewData["CurrentPage"]" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Nhà cung cấp -->
+                <div class="form-group mb-4">
+                    <label asp-for="SupplierId" class="control-label">Nhà cung cấp</label>
+                    <select asp-for="SupplierId" class="form-control" id="supplierId" onchange="filterBatches()" required>
+                        <option value="">Chọn nhà cung cấp</option>
+                        @if (ViewData["Suppliers"] is IEnumerable<dynamic> suppliers && suppliers.Any())
+                        {
+                            @foreach (var supplier in suppliers)
+                            {
+                                <option value="@supplier.Id">@supplier.Name</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="">Không có nhà cung cấp</option>
+                        }
+                    </select>
+                    <span asp-validation-for="SupplierId" class="text-danger"></span>
+                </div>
+
+                <!-- Lô hàng -->
+                <div class="form-group mb-4">
+                    <label asp-for="BatchId" class="control-label">Lô hàng</label>
+                    <select asp-for="BatchId" class="form-control" id="batchId" onchange="updateBatchFields()" required>
+                        <option value="">Chọn lô hàng</option>
+                        @if (ViewData["Batches"] is IEnumerable<dynamic> batches && batches.Any())
+                        {
+                            @foreach (var batch in batches)
+                            {
+                                <option value="@batch.Id"
+                                        data-supplier="@batch.SupplierId"
+                                        data-import-date="@batch.ImportDate.ToString("yyyy-MM-dd")"
+                                        data-expiry-date="@batch.ExpiryDate.ToString("yyyy-MM-dd")">
+                                    @batch.SupplierName -
+                                    Ngày nhập: @batch.ImportDate.ToString("dd/MM/yyyy") -
+                                    Hết hạn: @(batch.ExpiryDate != null ? ((DateTime)batch.ExpiryDate).ToString("dd/MM/yyyy") : "N/A")
+                                </option>
+                            }
+                        }
+                        <option value="-1">Tạo lô hàng mới</option>
+                    </select>
+                    <span asp-validation-for="BatchId" class="text-danger"></span>
+                </div>
+
+                <!-- Các trường nhập thông tin lô hàng -->
+                <div id="batchFields">
+                    <div class="form-group mb-4">
+                        <label asp-for="ImportDate" class="control-label">Ngày nhập</label>
+                        <input asp-for="ImportDate" class="form-control" type="date" />
+                        <span asp-validation-for="ImportDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label asp-for="ExpiryDate" class="control-label">Ngày hết hạn</label>
+                        <input asp-for="ExpiryDate" class="form-control" type="date" />
+                        <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label asp-for="UnitPrice" class="control-label">Đơn giá</label>
+                        <input asp-for="UnitPrice" class="form-control" type="number" step="0.01" min="0" value="0" />
+                        <span asp-validation-for="UnitPrice" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Số lượng -->
+                <div class="form-group mb-4">
+                    <label asp-for="Quantity" class="control-label">Số lượng</label>
+                    <input asp-for="Quantity" class="form-control" type="number" min="1" required />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+
+                <!-- Lý do -->
+                <div class="form-group mb-4">
+                    <label asp-for="Reason" class="control-label">Lý do</label>
+                    <input asp-for="Reason" class="form-control" />
+                    <span asp-validation-for="Reason" class="text-danger"></span>
+                </div>
+
+                <!-- Submit -->
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary me-2">Nhập kho</button>
+                    <a asp-action="FlowerTypes" asp-route-pageNumber="@ViewData["CurrentPage"]" class="btn btn-outline-secondary">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #60a5fa;
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+        --text-muted: #6b7280;
+    }
+
+    h2 {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .control-label {
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        font-size: 1rem;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        padding: 8px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+    select.form-control {
+        appearance: none;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%231e293b" d="M7 10l5 5 5-5z"/></svg>') no-repeat right 15px center;
+        background-size: 12px;
+        padding-right: 35px;
+    }
+
+    .text-danger {
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-outline-secondary {
+        border-color: #6b7280;
+        color: #6b7280;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #4b5563;
+            border-color: #4b5563;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function filterBatches() {
+            var supplierId = document.getElementById("supplierId").value;
+            var batchSelect = document.getElementById("batchId");
+            var options = batchSelect.getElementsByTagName("option");
+
+            // Ẩn/hiện các lô dựa trên nhà cung cấp
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                var optionSupplierId = option.getAttribute("data-supplier");
+                if (option.value === "" || option.value === "-1") {
+                    option.style.display = "block"; // Luôn hiển thị tùy chọn "Chọn lô" và "Tạo lô mới"
+                } else if (optionSupplierId === supplierId) {
+                    option.style.display = "block";
+                } else {
+                    option.style.display = "none";
+                }
+            }
+
+            // Reset lựa chọn lô nếu không hợp lệ
+            var selectedOption = batchSelect.options[batchSelect.selectedIndex];
+            if (selectedOption && selectedOption.style.display === "none") {
+                batchSelect.value = "";
+            }
+
+            updateBatchFields(); // Cập nhật trạng thái các trường lô
+        }
+
+        function updateBatchFields() {
+            var batchId = document.getElementById("batchId").value;
+            var importDateInput = document.querySelector("input[name='ImportDate']");
+            var expiryDateInput = document.querySelector("input[name='ExpiryDate']");
+            var unitPriceInput = document.querySelector("input[name='UnitPrice']");
+
+            if (batchId === "-1" || batchId === "") { // Tạo lô mới hoặc chưa chọn lô
+                importDateInput.value = "@Model.ImportDate.ToString("yyyy-MM-dd")";
+                expiryDateInput.value = "@Model.ExpiryDate.ToString("yyyy-MM-dd")";
+                unitPriceInput.value = "0";
+                importDateInput.required = true;
+                expiryDateInput.required = true;
+                unitPriceInput.required = true;
+            } else { // Chọn lô hiện có
+                var selectedOption = document.getElementById("batchId").options[document.getElementById("batchId").selectedIndex];
+                importDateInput.value = selectedOption.getAttribute("data-import-date");
+                expiryDateInput.value = selectedOption.getAttribute("data-expiry-date");
+                // Không điền UnitPrice từ lô, giữ giá trị người dùng nhập
+                unitPriceInput.required = true;
+            }
+        }
+
+        document.querySelector("form").addEventListener("submit", function (event) {
+            var batchId = document.getElementById("batchId").value;
+            var supplierId = document.getElementById("supplierId").value;
+            var quantity = document.querySelector("input[name='Quantity']").value;
+            var today = new Date();
+
+            if (!supplierId) {
+                event.preventDefault();
+                alert("Vui lòng chọn nhà cung cấp!");
+                return;
+            }
+            if (!batchId) {
+                event.preventDefault();
+                alert("Vui lòng chọn lô hoặc tạo lô mới!");
+                return;
+            }
+            if (quantity <= 0) {
+                event.preventDefault();
+                alert("Số lượng phải lớn hơn 0!");
+                return;
+            }
+
+            var importDate = new Date(document.querySelector("input[name='ImportDate']").value);
+            var expiryDate = new Date(document.querySelector("input[name='ExpiryDate']").value);
+            var unitPrice = document.querySelector("input[name='UnitPrice']").value;
+
+            if (importDate > today) {
+                event.preventDefault();
+                alert("Ngày nhập không được ở tương lai!");
+                return;
+            }
+            if (expiryDate <= today) {
+                event.preventDefault();
+                alert("Ngày hết hạn phải sau ngày hiện tại!");
+                return;
+            }
+            if (unitPrice < 0) {
+                event.preventDefault();
+                alert("Giá nhập không được âm!");
+                return;
+            }
+        });
+
+        // Gọi hàm khi tải trang để kiểm tra trạng thái ban đầu
+        filterBatches();
+        updateBatchFields();
+    </script>
+}

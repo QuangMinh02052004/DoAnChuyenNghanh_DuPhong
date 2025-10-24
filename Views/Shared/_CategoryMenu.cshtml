@@ -1,0 +1,66 @@
+﻿@using Bloomie.Services.Interfaces;
+@inject ICategoryService CategoryService
+
+@{
+    var categories = await CategoryService.GetAllCategoriesAsync();
+    var mainCategories = categories.Where(c => c.ParentCategoryId == null).ToList();
+}
+
+<ul class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
+    </li>
+
+    @foreach (var category in mainCategories)
+    {
+        var subCategories = category.SubCategories as IEnumerable<Bloomie.Models.Entities.Category>;
+        var currentCategoryId = ViewContext.HttpContext.Request.Query["categoryId"].ToString();
+        int.TryParse(currentCategoryId, out int selectedCategoryId);
+        bool isActive = selectedCategoryId == category.Id || (subCategories != null && subCategories.Any(sc => sc.Id == selectedCategoryId));
+
+        <li class="nav-item dropdown">
+            <a class="nav-link @(isActive ? "active" : "")"
+               href="@(subCategories != null && subCategories.Any() ? "#" : Url.Action("Index", "Product", new { categoryId = category.Id }))"
+               id="navbarDropdown-@category.Id">
+                @category.Name
+            </a>
+            @if (subCategories != null && subCategories.Any())
+            {
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown-@category.Id">
+                    <li>
+                        <a class="dropdown-item @(selectedCategoryId == category.Id ? "active" : "")"
+                           asp-controller="Product"
+                           asp-action="Index"
+                           asp-route-categoryId="@category.Id">
+                            Tất cả
+                        </a>
+                    </li>
+                    @foreach (var subCategory in subCategories)
+                    {
+                        <li>
+                            <a class="dropdown-item @(selectedCategoryId == subCategory.Id ? "active" : "")"
+                               asp-controller="Product"
+                               asp-action="Index"
+                               asp-route-categoryId="@subCategory.Id">
+                                @subCategory.Name
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+        </li>
+    }
+
+    @if (User.IsInRole("Admin"))
+    {
+        <li class="nav-item">
+            <a class="nav-link" asp-area="Admin" asp-controller="AdminDashboard" asp-action="Index">Quản lý</a>
+        </li>
+    }
+	else if (User.IsInRole("Staff"))
+	{
+		<li class="nav-item">
+			<a class="nav-link" asp-area="Staff" asp-controller="StaffDashboard" asp-action="Index">Quản lý</a>
+		</li>
+	}
+</ul>

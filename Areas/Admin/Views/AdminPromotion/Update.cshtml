@@ -1,0 +1,288 @@
+﻿@model Bloomie.Models.Entities.Promotion
+@{
+    ViewData["Title"] = "Chỉnh sửa khuyến mãi";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid mt-2 p-0">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h2 class="mb-4 fw-bold text-dark">Chỉnh Sửa Khuyến Mãi</h2>
+
+            <form asp-action="Update" method="post" class="needs-validation" novalidate>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" name="currentPage" value="@ViewData["CurrentPage"]" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="Code" class="form-label">Mã khuyến mãi</label>
+                    <input asp-for="Code" class="form-control" required maxlength="50" />
+                    <span asp-validation-for="Code" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Description" class="form-label">Mô tả khuyến mãi</label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="DiscountPercentage" class="form-label">Phần trăm giảm giá</label>
+                    <input asp-for="DiscountPercentage" class="form-control" type="number" step="0.01" required min="0" max="100" />
+                    <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="StartDate" class="form-label">Ngày bắt đầu</label>
+                    <input asp-for="StartDate" class="form-control" type="datetime-local" required />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="EndDate" class="form-label">Ngày kết thúc</label>
+                    <input asp-for="EndDate" class="form-control" type="datetime-local" required />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                </div>
+
+                <!-- Hiển thị trạng thái -->
+                <div class="form-group mb-3">
+                    <label class="form-label">Trạng thái</label>
+                    <div>
+                        @if (Model != null && Model.StartDate != null && Model.EndDate != null)
+                        {
+                            @if (Model.EndDate.Date < DateTime.Now.Date)
+                            {
+                                <span class="badge bg-danger">
+                                    Đã hết hạn
+                                    <span>(Kết thúc: @Model.EndDate.ToString("dd/MM/yyyy"))</span>
+                                </span>
+                            }
+                            else if (Model.StartDate.Date <= DateTime.Now.Date && Model.EndDate.Date >= DateTime.Now.Date)
+                            {
+                                <span class="badge bg-success">Hoạt động</span>
+                            }
+                            else
+                            {
+                                <div>
+                                    <span class="badge bg-danger">Không hoạt động</span>
+                                    @if (Model.StartDate.Date > DateTime.Now.Date)
+                                    {
+                                        <div>(Bắt đầu: @Model.StartDate.ToString("dd/MM/yyyy"))</div>
+                                    }
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Dữ liệu không hợp lệ</span>
+                        }
+                        <small class="form-text text-muted">Trạng thái sẽ tự động cập nhật dựa trên ngày bắt đầu và kết thúc.</small>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="PromotionType" class="form-label">Loại khuyến mãi</label>
+                    <select asp-for="PromotionType" class="form-control" required onchange="toggleProductSelection()">
+                        <option value="">Chọn loại khuyến mãi</option>
+                        <option value="Product">Áp dụng cho sản phẩm</option>
+                        <option value="Order">Áp dụng cho hóa đơn</option>
+                    </select>
+                    <span asp-validation-for="PromotionType" class="text-danger"></span>
+                </div>
+
+                <div id="productSelection" class="form-group mb-4" style="display: none;">
+                    <label class="form-label">Sản phẩm áp dụng</label>
+                    <select name="productIds" multiple class="form-control">
+                        @foreach (var product in ViewBag.Products as List<Bloomie.Models.Entities.Product>)
+                        {
+                            var isSelected = Model.PromotionProducts?.Any(pp => pp.ProductId == product.Id) ?? false;
+                            <option value="@product.Id" selected="@(isSelected ? "selected" : null)">@product.Name</option>
+                        }
+                    </select>
+                    <small class="form-text text-muted">Giữ Ctrl để chọn nhiều sản phẩm.</small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="MinimumOrderValue" class="form-label">Giá trị đơn hàng tối thiểu (đ)</label>
+                    <input asp-for="MinimumOrderValue" type="number" step="1000" class="form-control" min="0" />
+                    <small class="form-text text-muted">Để trống nếu không yêu cầu giá trị tối thiểu.</small>
+                    <span asp-validation-for="MinimumOrderValue" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="MaximumDiscountValue" class="form-label">Số tiền giảm tối đa (đ)</label>
+                    <input asp-for="MaximumDiscountValue" type="number" step="1000" class="form-control" min="0" />
+                    <small class="form-text text-muted">Để trống nếu không giới hạn số tiền giảm tối đa.</small>
+                    <span asp-validation-for="MaximumDiscountValue" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-sm me-2">Lưu</button>
+                <a asp-action="Index" asp-route-pageNumber="@ViewData["CurrentPage"]" class="btn btn-secondary btn-sm">Hủy</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script>CKEDITOR.replace( 'Description' );</script>
+
+    <script>
+        function toggleProductSelection() {
+            const promotionType = document.getElementById("PromotionType").value;
+            const productSelection = document.getElementById("productSelection");
+            if (promotionType === "Product") {
+                productSelection.style.display = "block";
+            } else {
+                productSelection.style.display = "none";
+            }
+        }
+
+        $(document).ready(function () {
+            toggleProductSelection();
+            $(".needs-validation").on("submit", function (event) {
+                if (!this.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                $(this).addClass("was-validated");
+            });
+        });
+    </script>
+}
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #60a5fa;
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+    }
+
+    h2 {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        padding: 8px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+        .form-control[type="datetime-local"] {
+            padding: 7px 8px;
+        }
+
+        .form-control[multiple] {
+            height: 150px;
+        }
+
+    .text-danger {
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-text {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-secondary {
+        background-color: #6b7280;
+        border-color: #6b7280;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+            border-color: #4b5563;
+            transform: translateY(-1px);
+        }
+
+    .badge.bg-success {
+        background-color: #28a745 !important;
+        color: #fff !important;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+
+    .badge.bg-danger {
+        background-color: #dc3545 !important;
+        color: #fff !important;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+
+    .badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: #212529 !important;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+</style>

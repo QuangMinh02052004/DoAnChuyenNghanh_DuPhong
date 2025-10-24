@@ -1,0 +1,430 @@
+﻿@model Bloomie.Models.Entities.Shipping
+@using Bloomie.Models.Entities
+
+@{
+    ViewData["Title"] = "Quản lý phí vận chuyển";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    var shippings = ViewBag.Shippings as List<Bloomie.Models.Entities.Shipping> ?? new List<Bloomie.Models.Entities.Shipping>();
+    int currentPage = ViewData["CurrentPage"] != null ? (int)ViewData["CurrentPage"] : 1;
+    int totalPages = ViewData["TotalPages"] != null ? (int)ViewData["TotalPages"] : 1;
+    int totalItems = ViewData["TotalItems"] != null ? (int)ViewData["TotalItems"] : 0;
+}
+
+<div class="container-fluid mt-2 p-0">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-dark">
+                    <i class="fas fa-truck text-primary me-2"></i> Quản lý phí vận chuyển
+                </h2>
+            </div>
+
+            <!-- Form thêm phí vận chuyển -->
+            <div class="mb-4">
+                <h4 class="fw-bold text-dark mb-3">Thêm phí vận chuyển</h4>
+                <form asp-action="Index" method="post" class="row g-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Tỉnh/Thành</label>
+                        <select class="form-control css_select" id="tinh" name="tinh" title="Chọn Tỉnh Thành">
+                            <option value="0">Tỉnh Thành</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Quận/Huyện</label>
+                        <select class="form-control css_select" id="quan" name="quan" title="Chọn Quận Huyện">
+                            <option value="0">Quận Huyện</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Phường/Xã</label>
+                        <select class="form-control css_select" id="phuong" name="phuong" title="Chọn Phường Xã">
+                            <option value="0">Phường Xã</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Giá (VNĐ)</label>
+                        <input asp-for="Price" id="price-shipping" class="form-control" placeholder="Nhập giá..." />
+                    </div>
+
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-primary btn-add-shipping w-100">Thêm</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Bảng danh sách phí vận chuyển -->
+            <div class="table-responsive">
+                <h4 class="fw-bold text-dark mb-3"><i class="fas fa-list me-2"></i> Danh sách phí vận chuyển</h4>
+                <table class="table table-hover table-bordered mb-0" id="myTable">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th class="col-id">STT</th>
+                            <th class="col-city">Tỉnh/Thành</th>
+                            <th class="col-district">Quận/Huyện</th>
+                            <th class="col-ward">Phường/Xã</th>
+                            <th class="col-price">Giá (VNĐ)</th>
+                            <th class="col-actions">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (shippings.Any())
+                        {
+                            int index = (currentPage - 1) * 10 + 1; // Giả sử pageSize = 10, tương tự AdminOrder
+                            @foreach (var shipping in shippings)
+                            {
+                                <tr>
+                                    <td>@index</td>
+                                    <td class="text-left">@shipping.City</td>
+                                    <td class="text-left">@shipping.District</td>
+                                    <td class="text-left">@shipping.Ward</td>
+                                    <td class="price-cell" data-price="@shipping.Price">@shipping.Price.ToString("#,##0")</td>
+                                    <td class="actions-cell">
+                                        <form asp-action="Delete" asp-controller="AdminShipping" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa không?');" style="display:inline;">
+                                            <input type="hidden" name="id" value="@shipping.Id" />
+                                            <button type="submit" class="btn btn-danger btn-sm" data-bs-toggle="tooltip" data-bs-title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                index++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">Không có phí vận chuyển nào.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls (nếu có phân trang) -->
+            @if (totalPages > 1)
+            {
+                <div class="pagination-section mt-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="pagination-info">
+                            Hiển thị @shippings.Count() trong tổng số @totalItems phí vận chuyển
+                        </div>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-end mb-0">
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                    <a class="page-link" asp-action="Index" asp-controller="AdminShipping" asp-route-pageNumber="@(currentPage - 1)" aria-label="Previous">
+                                        <span aria-hidden="true">«</span>
+                                    </a>
+                                </li>
+                                @for (int i = 1; i <= totalPages; i++)
+                                {
+                                    <li class="page-item @(i == currentPage ? "active" : "")">
+                                        <a class="page-link" asp-action="Index" asp-controller="AdminShipping" asp-route-pageNumber="@i">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                    <a class="page-link" asp-action="Index" asp-controller="AdminShipping" asp-route-pageNumber="@(currentPage + 1)" aria-label="Next">
+                                        <span aria-hidden="true">»</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #60a5fa;
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+    }
+
+    h2, h4 {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h4 {
+        font-size: 1.25rem;
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .form-label {
+        font-size: 0.9rem;
+        color: var(--text-dark);
+        font-weight: 500;
+    }
+
+    .form-control, .css_select {
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        padding: 8px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .form-control:focus, .css_select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .table {
+        background-color: #ffffff;
+        border-radius: 8px;
+        table-layout: fixed;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+        .table th, .table td {
+            border-color: #e5e7eb;
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    .table-bordered td.text-left {
+        text-align: left !important;
+    }
+
+    .col-id {
+        width: 5%;
+        min-width: 50px;
+    }
+
+    .col-city {
+        width: 25%;
+        min-width: 200px;
+    }
+
+    .col-district {
+        width: 25%;
+        min-width: 200px;
+    }
+
+    .col-ward {
+        width: 25%;
+        min-width: 200px;
+    }
+
+    .col-price {
+        width: 10%;
+        min-width: 130px;
+    }
+
+    .col-actions {
+        width: 10%;
+        min-width: 100px;
+    }
+
+    .price-cell {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+
+    .actions-cell {
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        min-width: 32px;
+        transition: all 0.2s ease;
+        background-color: #ef4444;
+        border-color: #ef4444;
+    }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+            transform: translateY(-1px);
+        }
+
+    .pagination-section {
+        padding: 12px 0;
+        background-color: #f8fafc;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .pagination-info {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .pagination .page-link {
+        border-radius: 6px;
+        margin: 0 4px;
+        color: var(--primary-color);
+        border: 1px solid #d1d5db;
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        transition: all 0.2s ease;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: var(--text-light);
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #d1d5db;
+        background-color: #f8fafc;
+        border-color: #d1d5db;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #e5e7eb;
+        border-color: #d1d5db;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(".btn-add-shipping").click(function() {
+            var tinh = $("#tinh").find('option:selected').text();
+            var quan = $("#quan").find('option:selected').text();
+            var phuong = $("#phuong").find('option:selected').text();
+            var price = $("#price-shipping").val();
+            if (tinh == '' || quan == '' || phuong == '' || price == '') {
+                Swal.fire("Vui lòng không bỏ trống");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("StoreShipping", "AdminShipping", new { area = "Admin" })",
+                    data: { tinh: tinh, quan: quan, phuong: phuong, price: price },
+                    success: function (result) {
+                        if (result.success) {
+                            Swal.fire("Thêm vận chuyển thành công. Load lại page để lấy data.");
+                        } else if (result.duplicate) {
+                            Swal.fire("Dữ liệu trùng lặp.");
+                        }
+                    }
+                });
+            }
+        });
+
+        $(document).ready(function() {
+            // Lấy tỉnh thành
+            $.getJSON('https://esgoo.net/api-tinhthanh/1/0.htm', function(data_tinh) {
+                if (data_tinh.error == 0) {
+                    $.each(data_tinh.data, function(key_tinh, val_tinh) {
+                        $("#tinh").append('<option value="' + val_tinh.id + '">' + val_tinh.full_name + '</option>');
+                    });
+                    $("#tinh").change(function(e) {
+                        var idtinh = $(this).val();
+                        // Lấy quận huyện
+                        $.getJSON('https://esgoo.net/api-tinhthanh/2/' + idtinh + '.htm', function(data_quan) {
+                            if (data_quan.error == 0) {
+                                $("#quan").html('<option value="0">Quận Huyện</option>');
+                                $("#phuong").html('<option value="0">Phường Xã</option>');
+                                $.each(data_quan.data, function(key_quan, val_quan) {
+                                    $("#quan").append('<option value="' + val_quan.id + '">' + val_quan.full_name + '</option>');
+                                });
+                                // Lấy phường xã
+                                $("#quan").change(function(e) {
+                                    var idquan = $(this).val();
+                                    $.getJSON('https://esgoo.net/api-tinhthanh/3/' + idquan + '.htm', function(data_phuong) {
+                                        if (data_phuong.error == 0) {
+                                            $("#phuong").html('<option value="0">Phường Xã</option>');
+                                            $.each(data_phuong.data, function(key_phuong, val_phuong) {
+                                                $("#phuong").append('<option value="' + val_phuong.id + '">' + val_phuong.full_name + '</option>');
+                                            });
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+
+            // Initialize Bootstrap tooltips
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+            // Format price cells
+            const priceCells = document.querySelectorAll('.price-cell');
+            priceCells.forEach(cell => {
+                let value = parseFloat(cell.getAttribute('data-price'));
+                if (!isNaN(value)) {
+                    cell.textContent = formatNumber(value) + ' đ';
+                }
+            });
+        });
+
+        function formatNumber(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    </script>
+}

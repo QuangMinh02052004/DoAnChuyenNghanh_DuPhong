@@ -1,0 +1,1756 @@
+﻿@using Microsoft.AspNetCore.Http
+@model Bloomie.Models.Entities.Product
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var ratings = ViewBag.Ratings as List<Bloomie.Models.Entities.Rating>;
+    var averageRating = ViewBag.AverageRating != null ? (double)ViewBag.AverageRating : 0;
+    var parentCategory = ViewBag.ParentCategory as Bloomie.Models.Entities.Category;
+    var subCategory = ViewBag.SubCategory as Bloomie.Models.Entities.Category;
+    var similarProducts = ViewBag.SimilarProducts as List<Bloomie.Models.Entities.Product>;
+    var currentUserId = User?.Claims?.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+    // Tính phân bố đánh giá
+    var totalRatings = ratings?.Count ?? 0;
+    var ratingDistribution = new Dictionary<int, int>
+    {
+        { 5, ratings?.Count(r => r.Star == 5) ?? 0 },
+        { 4, ratings?.Count(r => r.Star == 4) ?? 0 },
+        { 3, ratings?.Count(r => r.Star == 3) ?? 0 },
+        { 2, ratings?.Count(r => r.Star == 2) ?? 0 },
+        { 1, ratings?.Count(r => r.Star == 1) ?? 0 }
+    };
+}
+
+<div class="container mt-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-transparent py-2">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")" class="text-secondary text-decoration-none">Trang chủ</a></li>
+            @if (parentCategory != null)
+            {
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Product", new { categoryId = parentCategory.Id })" class="text-secondary text-decoration-none">@parentCategory.Name</a></li>
+            }
+            @if (subCategory != null)
+            {
+                <li class="breadcrumb-item active" aria-current="page">@subCategory.Name</li>
+            }
+        </ol>
+    </nav>
+
+    <!-- Phần chi tiết sản phẩm -->
+    <div class="row g-4">
+        <!-- Carousel hình ảnh sản phẩm và mô tả -->
+        <div class="col-md-6">
+            <!-- Carousel hình ảnh -->
+            <div class="card product-image">
+                <div id="productCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <div class="carousel-item active">
+                                <img src="@Model.ImageUrl" class="carousel-img" alt="Main Image">
+                            </div>
+                        }
+                        @if (Model.Images != null && Model.Images.Any())
+                        {
+                            var isFirst = string.IsNullOrEmpty(Model.ImageUrl);
+                            foreach (var image in Model.Images)
+                            {
+                                <div class="carousel-item @(isFirst ? "active" : "")">
+                                    <img src="@image.Url" class="carousel-img" alt="Additional Image">
+                                </div>
+                                isFirst = false;
+                            }
+                        }
+                        @if (string.IsNullOrEmpty(Model.ImageUrl) && (Model.Images == null || !Model.Images.Any()))
+                        {
+                            <div class="carousel-item active">
+                                <img src="/images/placeholder.jpg" class="carousel-img" alt="No Image">
+                            </div>
+                        }
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl) || (Model.Images != null && Model.Images.Any()))
+                    {
+                        <div class="carousel-thumbnails mt-1 mb-1 d-flex justify-content-center gap-2">
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <img src="@Model.ImageUrl" class="thumbnail-img rounded" data-bs-target="#productCarousel" data-bs-slide-to="0" alt="Thumbnail">
+                            }
+                            @{
+                                var index = string.IsNullOrEmpty(Model.ImageUrl) ? 0 : 1;
+                                if (Model.Images != null)
+                                {
+                                    foreach (var image in Model.Images)
+                                    {
+                                        <img src="@image.Url" class="thumbnail-img rounded" data-bs-target="#productCarousel" data-bs-slide-to="@index" alt="Thumbnail">
+                                        index++;
+                                    }
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Mô tả -->
+            <div class="product-description p-3 bg-light border rounded-3 mt-4">
+                <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-info-circle me-2"></i> Mô tả sản phẩm</h5>
+                <div class="description-content">
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        var decodedDescription = System.Net.WebUtility.HtmlDecode(Model.Description);
+                        @Html.Raw(decodedDescription)
+                        <p class="text-muted fst-italic mt-3 mb-2">* Do mỗi sản phẩm đều được làm thủ công & màu hoa có thể thay đổi theo mùa hoa trong năm nên sẽ có chút khác biệt so với hình ảnh.</p>
+                    }
+                    else
+                    {
+                        <p class="mb-2">Không có mô tả chi tiết.</p>
+                        <p class="text-muted fst-italic mb-2">* Do mỗi sản phẩm đều được làm thủ công & màu hoa có thể thay đổi theo mùa hoa trong năm nên sẽ có chút khác biệt so với hình ảnh.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin sản phẩm -->
+        <div class="col-md-6">
+            <div class="card product-details h-100 p-4">
+                <h2 class="product-name text-dark fw-bold fs-2 mb-3">@Model.Name</h2>
+                <div class="product-price mb-4">
+                    @if (Model.DiscountPercentage.HasValue && Model.DiscountPercentage > 0)
+                    {
+                        <div>
+                            <span class="text-muted text-decoration-line-through me-2">@String.Format("{0:#,##0}", Model.Price) đ</span>
+                            <span class="text-danger fw-bold fs-3">@String.Format("{0:#,##0}", Model.DiscountPrice) đ</span>
+                            <span class="badge bg-danger ms-2">Giảm @Model.DiscountPercentage%</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-danger fw-bold fs-3">Giá: @String.Format("{0:#,##0}", Model.Price) đ</span>
+                    }
+                </div>
+                <div class="variant-selector mb-4 d-flex align-items-center">
+                    <label class="fw-bold me-3">Khác nhau:</label>
+                    <select id="variant" class="form-select w-auto">
+                        <option value="Cơ Bản" selected>Cơ Bản</option>
+                        <option value="Nâng cấp">Nâng cấp</option>
+                    </select>
+                </div>
+                <div class="quantity-selector mb-4 d-flex align-items-center">
+                    <label for="quantity" class="fw-bold me-3">Số lượng:</label>
+                    <div class="input-group">
+                        <button type="button" class="btn btn-outline-secondary btn-quantity" onclick="updateQuantity(-1)">-</button>
+                        <input type="number" id="quantity" name="quantity" value="1" class="form-control text-center quantity-input" min="1">
+                        <button type="button" class="btn btn-outline-secondary btn-quantity" onclick="updateQuantity(1)">+</button>
+                    </div>
+                </div>
+
+                <!-- Chọn ngày giao hàng -->
+                <div class="delivery-date-selector mb-4">
+                    <label class="fw-bold mb-2">Chọn ngày giao hàng:</label>
+                    <div class="delivery-date-options d-flex gap-2 flex-wrap">
+                        @{
+                            var today = DateTime.Now; 
+                            var tomorrow = today.AddDays(1); 
+                            var dayAfterTomorrow = today.AddDays(2); 
+                            var daysOfWeek = new[] { "CHỦ NHẬT", "THỨ HAI", "THỨ BA", "THỨ TƯ", "THỨ NĂM", "THỨ SÁU", "THỨ BẢY" };
+                        }
+                        <button type="button" class="btn btn-outline-secondary delivery-date-btn active" data-date="@today.ToString("yyyy-MM-dd")">
+                            @today.ToString("dd") THÁNG @today.ToString("MM")<br>HÔM NAY
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary delivery-date-btn" data-date="@tomorrow.ToString("yyyy-MM-dd")">
+                            @tomorrow.ToString("dd") THÁNG @tomorrow.ToString("MM")<br>NGÀY MAI
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary delivery-date-btn" data-date="@dayAfterTomorrow.ToString("yyyy-MM-dd")">
+                            @dayAfterTomorrow.ToString("dd") THÁNG @dayAfterTomorrow.ToString("MM")<br>@daysOfWeek[(int)dayAfterTomorrow.DayOfWeek]
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary delivery-date-calendar" id="calendarBtn" data-date="">
+                            <i class="bi bi-calendar3" id="calendarBtnIcon"></i>
+                            <span id="calendarBtnText">Lịch</span>
+                        </button>
+                        <!-- Input ẩn để lưu ngày chọn từ lịch -->
+                        <input type="hidden" id="calendarInput" value="@today.ToString("yyyy-MM-dd")">
+                    </div>
+                    <span id="selectedDeliveryDate" class="mt-2 d-block fw-bold"></span>
+                </div>
+
+                <!-- Chọn thời gian giao hàng -->
+                <div class="delivery-time-selector mb-4">
+                    <label class="fw-bold mb-2">Chọn thời gian giao hàng:</label>
+                    <div class="delivery-time-options d-flex gap-2 flex-wrap">
+                        <button type="button" class="btn btn-outline-secondary delivery-time-btn" data-time="08:00-10:00">8h - 10h</button>
+                        <button type="button" class="btn btn-outline-secondary delivery-time-btn" data-time="09:00-11:00">9h - 11h</button>
+                        <button type="button" class="btn btn-outline-secondary delivery-time-btn" data-time="10:00-12:00">10h - 12h</button>
+                        <button type="button" class="btn btn-outline-secondary delivery-time-btn" data-time="11:00-13:00">11h - 13h</button>
+                        <button type="button" class="btn btn-outline-secondary delivery-time-btn" data-time="12:00-14:00">12h - 14h</button>
+                        <button type="button" class="btn btn-outline-secondary delivery-time-btn" data-time="13:00-15:00">13h - 15h</button>
+                        <button type="button" class="btn btn-outline-secondary delivery-time-btn" data-time="14:00-16:00">14h - 16h</button>
+                        <button type="button" class="btn btn-outline-secondary delivery-time-btn" data-time="15:00-17:00">15h - 17h</button>
+                        <button type="button" class="btn btn-outline-secondary delivery-time-btn" data-time="16:00-18:00">16h - 18h</button>
+                        <button type="button" class="btn btn-outline-secondary delivery-time-btn" data-time="17:00-19:00">17h - 19h</button>
+                        <button type="button" class="btn btn-outline-secondary delivery-time-btn" data-time="18:00-20:00">18h - 20h</button>
+                        <button type="button" class="btn btn-outline-secondary delivery-time-btn" data-time="19:00-21:00">19h - 21h</button>
+                    </div>
+                    <span id="selectedDeliveryTime" class="mt-2 d-block fw-bold"></span>
+                </div>
+                <div class="action-buttons mb-4 d-flex gap-3">
+                    <a href="#" onclick="addToCart(@Model.Id); return false;" class="btn btn-primary-custom fw-bold w-100 add-to-cart-btn" data-quantity="1">
+                        <i class="bi bi-cart-plus me-2"></i> Thêm vào giỏ hàng
+                    </a>
+                    <a href="#" onclick="buyNow(@Model.Id); return false;" class="btn btn-buy-now fw-bold w-100 buy-now-btn">
+                        <i class="bi bi-lightning-fill me-2"></i> Mua ngay
+                    </a>
+                </div>
+                <div class="product-additional-info">
+                    <div class="shipping-info text-muted mt-2">
+                        <small><i class="bi bi-truck me-1"></i> * Miễn phí vận chuyển cho đơn hàng trên 500.000đ. Thời gian xử lý: 1-2 ngày làm việc.</small>
+                    </div>
+                    <div class="product-code mt-2">
+                        <small><i class="bi bi-instagram me-1"></i> Theo dõi chúng tôi: <a href="#" class="text-primary">Facebook</a> | <a href="#" class="text-primary">Instagram</a></small>
+                    </div>
+                    <div class="hotline-info mt-2">
+                        <small><i class="bi bi-telephone me-1"></i> Hotline hoạt động: 8h-21h hàng ngày.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ưu đãi đặc biệt -->
+    <div class="card special-offers mt-5 p-4">
+        <h5 class="fw-bold text-primary mb-4"><i class="bi bi-gift me-2"></i> Ưu đãi đặc biệt</h5>
+        <ul class="list-unstyled">
+            <li class="mb-2"><span class="text-primary fw-bold">1.</span> Tặng Banner Hỗ trợ Thiếp (Trị giá 20.000đ - 50.000đ) Miễn Phí</li>
+            <li class="mb-2"><span class="text-primary fw-bold">2.</span> Giảm Tiệp 3% Cho Đơn Hàng Bán Tạo ONLINE Lần Thứ 2, 5% Cho Đơn Hàng Bán Tạo ONLINE Lần Thứ 6 và 10% Cho Đơn Hàng Bán Tạo ONLINE Lần Thứ 12.</li>
+            <li class="mb-2"><span class="text-primary fw-bold">3.</span> Miễn Phí Giao Khu Vực Nội Thành (Chi Tiết)</li>
+            <li class="mb-2"><span class="text-primary fw-bold">4.</span> Giao Gấp Trong vòng 2 Giờ</li>
+            <li class="mb-2"><span class="text-primary fw-bold">5.</span> Cam Kết 100% Hoàn Lại Tiền Nếu Bạn Không Hài Lòng</li>
+            <li class="mb-2"><span class="text-primary fw-bold">6.</span> Cam Kết Hoa Tươi Trên 3 Ngày</li>
+        </ul>
+    </div>
+
+    <!-- Đánh giá sản phẩm -->
+    <div class="card product-reviews mt-5 p-4">
+        <h5 class="fw-bold text-secondary mb-4"><i class="bi bi-star-fill me-2"></i> Đánh giá sản phẩm</h5>
+        <div class="rating-summary">
+            <div class="rating-overview d-flex align-items-center mb-3">
+                <div class="rating-score">
+                    <span class="rating-value">@averageRating.ToString("F1")</span>
+                    <div class="star-rating d-flex gap-1">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= averageRating)
+                            {
+                                <i class="bi bi-star-fill text-warning"></i>
+                            }
+                            else if (i - averageRating < 1)
+                            {
+                                <i class="bi bi-star-half text-warning"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-star text-warning"></i>
+                            }
+                        }
+                    </div>
+                    <span class="rating-out-of">/ 5</span>
+                </div>
+                <div class="rating-distribution ms-4">
+                    @for (int i = 5; i >= 1; i--)
+                    {
+                        var count = ratingDistribution[i];
+                        var percentage = totalRatings > 0 ? (count * 100.0 / totalRatings) : 0;
+                        <div class="rating-bar d-flex align-items-center mb-2">
+                            <span class="rating-level me-2">@i <i class="bi bi-star-fill text-warning"></i></span>
+                            <div class="progress" style="width: 200px; height: 10px;">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: @percentage%;" aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="rating-percentage ms-2">@percentage.ToString("F0")%</span>
+                            <span class="rating-count ms-2">(@count)</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            <p class="text-muted mb-3">(@totalRatings đánh giá)</p>
+        </div>
+        @if (ratings != null && ratings.Any())
+        {
+            <div class="ratings-list mb-4">
+                @foreach (var rating in ratings.Where(r => r.IsVisible))
+                {
+                    var isOwnReview = rating.UserId == currentUserId;
+                    var isLikedByCurrentUser = rating.UserLikes?.Any(ul => ul.UserId == currentUserId) ?? false;
+
+                    <div class="rating-item border-bottom py-3" id="rating-@rating.Id">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>@(rating.User?.FullName ?? "Người dùng ẩn danh")</strong>
+                                <span class="text-muted ms-2">@rating.ReviewDate.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            <div class="star-rating d-flex gap-1">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= rating.Star)
+                                    {
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-star text-warning"></i>
+                                    }
+                                }
+                            </div>
+                        </div>
+                        <p class="mt-2 text-dark rating-comment">@rating.Comment</p>
+                        @if (!string.IsNullOrEmpty(rating.ImageUrl))
+                        {
+                            <div class="rating-images mt-2">
+                                <img src="@rating.ImageUrl" alt="Rating Image" class="rating-image-thumbnail" />
+                            </div>
+                        }
+                        <div class="rating-actions mt-2 d-flex gap-2">
+                            <button class="btn btn-sm btn-reply-custom reply-btn" data-rating-id="@rating.Id">
+                                <i class="bi bi-reply-fill me-1"></i> Trả lời
+                            </button>
+                            <button class="btn btn-sm btn-like-custom like-btn @(isLikedByCurrentUser ? "active" : "")" data-rating-id="@rating.Id" data-likes="@rating.LikesCount" data-is-liked="@(isLikedByCurrentUser ? "true" : "false")">
+                                <i class="bi bi-hand-thumbs-up me-1"></i> Hữu ích (<span class="like-count">@rating.LikesCount</span>)
+                            </button>
+                            @if (User.Identity.IsAuthenticated && !isOwnReview)
+                            {
+                                <button class="btn btn-sm btn-report-custom report-btn" data-rating-id="@rating.Id">
+                                    <i class="bi bi-flag-fill me-1"></i> Báo cáo sai phạm
+                                </button>
+                            }
+                            @if (isOwnReview)
+                            {
+                                <button class="btn btn-sm btn-delete-custom delete-rating" data-rating-id="@rating.Id" title="Xóa đánh giá">
+                                    <i class="bi bi-trash me-1"></i> Xóa
+                                </button>
+                            }
+                        </div>
+                        <!-- Form trả lời (Mặc định là ẩn) -->
+                        <div class="reply-form mt-3" id="reply-form-@rating.Id" style="display: none;">
+                            <form asp-action="SubmitReply" method="post">
+                                <input type="hidden" name="ratingId" value="@rating.Id" />
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold reply-label">Trả lời:</label>
+                                    <textarea class="form-control reply-comment" name="comment" rows="2" placeholder="Nhập câu trả lời của bạn..." required></textarea>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary-custom btn-sm">Gửi trả lời</button>
+                                    <button type="button" class="btn btn-secondary btn-sm cancel-reply" data-rating-id="@rating.Id">Hủy</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Form báo cáo (Mặc định là ẩn) -->
+                        <div class="report-form mt-3" id="report-form-@rating.Id" style="display: none;">
+                            <form asp-action="SubmitReport" method="post">
+                                <input type="hidden" name="ratingId" value="@rating.Id" />
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold report-label">Lý do báo cáo:</label>
+                                    <textarea class="form-control report-reason" name="reason" rows="2" placeholder="Vui lòng nhập lý do báo cáo..." required></textarea>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-danger btn-sm">Gửi báo cáo</button>
+                                    <button type="button" class="btn btn-secondary btn-sm cancel-report" data-rating-id="@rating.Id">Hủy</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Phần trả lời -->
+                        @if (rating.Replies != null && rating.Replies.Any())
+                        {
+                            <div class="replies mt-3 ms-4">
+                                @foreach (var reply in rating.Replies.OrderBy(r => r.ReplyDate))
+                                {
+                                    var isOwnReply = reply.UserId == currentUserId;
+                                    var isReplyLikedByCurrentUser = reply.UserLikes?.Any(ul => ul.UserId == currentUserId) ?? false;
+                                    <div class="reply-item border-top pt-2" id="reply-@reply.Id">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-arrow-return-right reply-icon me-2"></i>
+                                                <div>
+                                                    <strong>@(reply.User?.UserName ?? "Người dùng ẩn danh")</strong>
+                                                    <span class="text-muted ms-2">@reply.ReplyDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="mt-1 text-dark reply-content">@reply.Comment</p>
+                                        <div class="reply-actions mt-2 d-flex gap-2">
+                                            <button class="btn btn-sm btn-like-custom like-btn @(isReplyLikedByCurrentUser ? "active" : "")" data-reply-id="@reply.Id" data-likes="@reply.LikesCount" data-is-liked="@(isReplyLikedByCurrentUser ? "true" : "false")">
+                                                <i class="bi bi-hand-thumbs-up me-1"></i> Hữu ích (<span class="like-count">@reply.LikesCount</span>)
+                                            </button>
+                                            @if (isOwnReply)
+                                            {
+                                                <button class="btn btn-sm btn-delete-custom delete-reply" data-reply-id="@reply.Id" title="Xóa trả lời">
+                                                    <i class="bi bi-trash me-1"></i> Xóa
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted mb-4">Chưa có đánh giá nào cho sản phẩm này.</p>
+        }
+
+        <!-- Gửi Đánh giá Nút chuyển đổi và Form -->
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="submit-review-toggle mb-3">
+                <button type="button" class="btn btn-primary-custom toggle-review-form">
+                    <i class="bi bi-star-fill me-2"></i> Gửi đánh giá của bạn
+                </button>
+                <div class="review-form-container mt-3" style="display: none;">
+                    <form asp-action="SubmitRating" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Đánh giá sao:</label>
+                            <div class="star-rating-input d-flex gap-2 mb-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span class="star" data-value="@i">
+                                        <i class="bi bi-star text-warning fs-4"></i>
+                                    </span>
+                                }
+                            </div>
+                            <input type="hidden" name="star" id="starRating" value="0" required />
+                            <div class="text-danger" id="starError" style="display: none;">Vui lòng chọn số sao.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="comment" class="form-label fw-semibold">Bình luận:</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="3" placeholder="Nhập bình luận của bạn..." required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ratingImage" class="form-label fw-semibold">Tải ảnh lên (tối đa 3 ảnh):</label>
+                            <input type="file" class="form-control" id="ratingImage" name="ratingImage" accept="image/*" multiple>
+                        </div>
+                        <button type="submit" class="btn btn-primary-custom">Gửi đánh giá</button>
+                        <button type="button" class="btn btn-secondary ms-2 cancel-review-form">Hủy</button>
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">Vui lòng <a href="@Url.Action("Login", "Account", new { returnUrl = Url.Action("Display", "Product", new { id = Model.Id }) })" class="text-decoration-none text-primary">đăng nhập</a> để đánh giá sản phẩm.</p>
+        }
+    </div>
+
+    <!-- Sản phẩm tương tự -->
+    @if (similarProducts != null && similarProducts.Any())
+    {
+        <div class="card similar-products mt-5 p-4">
+            <h5 class="fw-bold text-secondary mb-4"><i class="bi bi-box-seam me-2"></i> Sản phẩm tương tự</h5>
+            <div class="row row-cols-1 row-cols-md-4 g-4">
+                @foreach (var similarProduct in similarProducts)
+                {
+                    <div class="col">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <a asp-controller="Product" asp-action="Display" asp-route-id="@similarProduct.Id">
+                                <img src="@similarProduct.ImageUrl" class="card-img-top" alt="@similarProduct.Name" style="height: 200px; object-fit: cover;">
+                            </a>
+                            <div class="card-body p-3">
+                                <h6 class="card-title">
+                                    <a asp-controller="Product" asp-action="Display" asp-route-id="@similarProduct.Id" class="text-dark text-decoration-none">@similarProduct.Name</a>
+                                </h6>
+                                <div class="card-price mt-2">
+                                    @if (similarProduct.DiscountPercentage.HasValue && similarProduct.DiscountPercentage > 0)
+                                    {
+                                        <span class="text-muted text-decoration-line-through me-2">@String.Format("{0:#,##0}", similarProduct.Price) đ</span>
+                                        <span class="text-danger fw-bold">@String.Format("{0:#,##0}", similarProduct.DiscountPrice) đ</span>
+                                        <span class="badge bg-danger ms-2">Giảm @similarProduct.DiscountPercentage%</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger fw-bold">@String.Format("{0:#,##0}", similarProduct.Price) đ</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 p-2">
+                                <a asp-controller="Product" asp-action="Display" asp-route-id="@similarProduct.Id" class="btn btn-outline-primary w-100">Xem chi tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Popup thêm vào giỏ hàng -->
+    <div class="custom-popup" id="addToCartPopup" style="display: none;">
+        <div class="custom-popup-content">
+            <div class="custom-popup-header d-flex justify-content-between align-items-center border-bottom pb-2">
+                <h5 class="custom-popup-title d-flex align-items-center text-success">
+                    <i class="bi bi-check-circle me-2"></i> Đã thêm mặt hàng vào giỏ hàng của bạn!
+                </h5>
+                <button type="button" class="custom-popup-close btn-close" id="closePopupBtn" aria-label="Close"></button>
+            </div>
+            <div class="custom-popup-body py-3">
+                <div class="d-flex align-items-center">
+                    <img id="popupProductImage" src="@Model.ImageUrl" alt="Product Image" style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px;">
+                    <div>
+                        <p class="mb-1 fw-bold" id="popupProductName">@Model.Name</p>
+                        <p class="mb-1">Giá Sản Phẩm: <span id="popupProductPrice">@(Model.DiscountPercentage.HasValue && Model.DiscountPercentage > 0 ? String.Format("{0:#,##0}", Model.DiscountPrice) : String.Format("{0:#,##0}", Model.Price)) đ</span></p>
+                        @* <p class="mb-1">Khác nhau: <span id="popupProductVariant">Cơ Bản</span></p> *@
+                        <p class="mb-1">Số lượng: <span id="popupProductQuantity">1</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="custom-popup-footer d-flex justify-content-end gap-2 pt-2">
+                <button type="button" class="btn btn-outline-secondary" id="continueShoppingPopupBtn">Tiếp tục mua sắm</button>
+                <a href="@Url.Action("Checkout", "Order")" class="btn btn-primary">Tiến hành thanh toán</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS -->
+<style>
+    .product-image {
+        overflow: hidden;
+    }
+
+    .carousel-inner {
+        background-color: #f8f8f8;
+        border-radius: 8px;
+        height: 500px;
+        padding: 10px;
+    }
+
+    .carousel-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .product-image .carousel-img {
+        max-width: 100%;
+        max-height: 500px;
+        object-fit: contain;
+        width: 100%;
+        transition: transform 0.3s ease;
+    }
+
+        .product-image .carousel-img:hover {
+            transform: scale(1.05);
+        }
+
+    .carousel-thumbnails {
+        margin-top: 4px;
+    }
+
+        .carousel-thumbnails .thumbnail-img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            background-color: #f8f8f8;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            cursor: pointer;
+        }
+
+            .carousel-thumbnails .thumbnail-img:hover,
+            .carousel-thumbnails .thumbnail-img.active {
+                border-color: #FF7043;
+                opacity: 1;
+                transform: scale(1.1);
+            }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 5%;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    /* Làm tên sản phẩm to lên thêm */
+    .product-name {
+        font-size: 2.5rem; /* Tăng từ 2.2rem lên 2.5rem */
+        font-weight: 700; /* Giữ chữ đậm */
+        color: #2d3436; /* Màu tối để nổi bật */
+        margin-bottom: 1rem; /* Giữ khoảng cách dưới để tách với giá */
+        text-transform: uppercase; /* Chữ in hoa để nổi bật */
+        letter-spacing: 1.5px; /* Khoảng cách chữ */
+        transition: color 0.3s ease; /* Hiệu ứng màu khi hover */
+    }
+
+        .product-name:hover {
+            color: #FF7043; /* Thay đổi màu khi hover */
+        }
+
+    /* Làm phần giá nhỏ lại thêm */
+    .product-price {
+        font-size: 1rem; /* Giảm từ 1.2rem xuống 1rem */
+        margin-bottom: 1.5rem; /* Giữ khoảng cách dưới */
+    }
+
+        .product-price .text-danger {
+            font-size: 1.1rem; /* Giảm từ 1.3rem xuống 1.1rem */
+            font-weight: 600; /* Giữ độ đậm */
+        }
+
+        .product-price .text-muted {
+            font-size: 0.9rem; /* Giảm từ 1rem xuống 0.9rem */
+        }
+
+        .product-price .badge {
+            font-size: 0.8rem; /* Giảm từ 0.9rem xuống 0.8rem */
+            padding: 3px 6px; /* Giảm padding của badge thêm */
+        }
+
+    /* Khu vực thông tin bổ sung dưới nút */
+    .product-additional-info {
+        border-top: 1px solid #eee; /* Thêm đường viền mỏng để tách biệt với nút */
+        padding-top: 1rem; /* Khoảng cách trên sau viền */
+        text-align: center; /* Canh giữa toàn bộ nội dung */
+    }
+
+    .shipping-info,
+    .product-code,
+    .hotline-info {
+        font-size: 0.9rem; /* Kích thước chữ đồng nhất */
+        line-height: 1.4; /* Khoảng cách dòng dễ đọc */
+    }
+
+        .shipping-info i,
+        .product-code i,
+        .hotline-info i {
+            font-size: 1rem; /* Kích thước icon */
+            vertical-align: middle; /* Căn giữa icon với text */
+        }
+
+        .product-code a {
+            transition: color 0.3s ease; /* Hiệu ứng hover cho link */
+        }
+
+            .product-code a:hover {
+                color: #FF7043; /* Thay đổi màu khi hover, nhất quán với giao diện */
+            }
+
+    /* Nút Thêm vào giỏ hàng */
+    .product-details .btn-primary-custom {
+        background-color: #fff; 
+        color: #000; 
+        border: 2px solid #000; 
+        padding: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .product-details .btn-primary-custom:hover {
+            background-color: #000; 
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+    /* Nút Mua ngay */
+    .product-details .btn-buy-now {
+        background-color: #FF7043; /* Màu cam nổi bật */
+        color: #fff; /* Chữ trắng để tương phản */
+        border: none; /* Bỏ viền */
+        padding: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .product-details .btn-buy-now:hover {
+            background-color: #E64A19; /* Màu cam đậm hơn khi hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+    .quantity-selector {
+        font-size: 0.9rem; /* Giảm kích thước chữ */
+        padding: 5px; /* Giảm padding */
+        gap: 5px; /* Giảm khoảng cách giữa các phần tử */
+    }
+
+        .quantity-selector .input-group {
+            width: 120px; /* Giảm chiều rộng tổng thể */
+        }
+
+        .quantity-selector .btn-quantity {
+            padding: 4px 8px; /* Giảm padding của nút + và - */
+            font-size: 0.9rem; /* Giảm kích thước chữ nút */
+        }
+
+        .quantity-selector .quantity-input {
+            padding: 4px; /* Giảm padding của ô input */
+            height: 30px; /* Giảm chiều cao ô input */
+            font-size: 0.9rem; /* Giảm kích thước chữ trong ô input */
+        }
+
+    .product-description,
+    .product-reviews,
+    .special-offers,
+    .similar-products {
+        border-color: #dee2e6;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .star-rating, .star-rating-input {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+        .star-rating i, .star-rating-input i {
+            font-size: 1.2rem;
+            color: #ced4da;
+            transition: color 0.3s ease;
+        }
+
+        .star-rating .text-warning, .star-rating-input .text-warning {
+            color: #f39c12 !important;
+        }
+
+        .star-rating-input .star {
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+        }
+
+            .star-rating-input .star:hover i {
+                color: #FF7043 !important;
+                transform: scale(1.2);
+            }
+
+            .star-rating-input .star.active i {
+                color: #FF7043 !important;
+                transform: scale(1.2);
+                display: inline-block;
+                font-family: "bootstrap-icons";
+            }
+
+                .star-rating-input .star.active i::before {
+                    content: "\f586"; /* Mã Unicode của bi-star-fill */
+                }
+
+    .rating-summary {
+        background-color: #f1f5f9;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .rating-overview {
+        display: flex;
+        align-items: center;
+    }
+
+    .rating-score {
+        text-align: center;
+    }
+
+    .rating-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #2d3436;
+    }
+
+    .rating-out-of {
+        font-size: 1rem;
+        color: #7f8c8d;
+    }
+
+    .rating-distribution {
+        flex-grow: 1;
+    }
+
+    .rating-bar {
+        font-size: 0.9rem;
+        color: #2d3436;
+    }
+
+    .rating-level {
+        width: 40px;
+        text-align: right;
+    }
+
+    .rating-percentage {
+        width: 50px;
+        text-align: right;
+    }
+
+    .rating-count {
+        width: 40px;
+        text-align: left;
+        color: #7f8c8d;
+    }
+
+    .progress {
+        flex-grow: 1;
+        height: 10px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+    }
+
+    .progress-bar {
+        background-color: #4682b4;
+        transition: width 0.3s ease;
+    }
+
+    .rating-item .star-rating {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+    }
+
+    .star-rating-input {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+        .star-rating-input .star i {
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+    .text-danger#starError {
+        font-size: 0.9rem;
+        margin-top: 5px;
+        padding: 5px 10px;
+        background-color: #f8d7da;
+        border-radius: 5px;
+    }
+
+    .special-offers li {
+        color: #444;
+        transition: color 0.3s ease;
+    }
+
+        .special-offers li:hover {
+            color: #007bff;
+        }
+
+    .similar-products .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .similar-products .btn-outline-primary:hover {
+        background-color: #FF7043;
+        border-color: #FF7043;
+        color: #fff;
+    }
+
+    .custom-popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .custom-popup-content {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        width: 90%;
+        max-width: 500px;
+        padding: 20px;
+    }
+
+    .custom-popup-close {
+        font-size: 1.5rem;
+        transition: color 0.3s ease;
+    }
+
+        .custom-popup-close:hover {
+            color: #FF7043;
+        }
+
+    .custom-popup-footer .btn-outline-secondary:hover {
+        background-color: #e9ecef;
+        transform: translateY(-1px);
+    }
+
+    .custom-popup-footer .btn-primary:hover {
+        background-color: #3a6d9a;
+        transform: translateY(-1px);
+    }
+
+    .description-item {
+        margin-left: 20px;
+        margin-bottom: 5px;
+    }
+
+    .rating-images {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .rating-image-thumbnail {
+        max-width: 100px;
+        max-height: 100px;
+        object-fit: cover;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        transition: transform 0.2s;
+    }
+
+        .rating-image-thumbnail:hover {
+            transform: scale(1.1);
+        }
+
+    /* Styles for Reply, Report, Like, and Delete */
+    .rating-item {
+        position: relative;
+    }
+
+    .btn-reply-custom, .btn-report-custom, .btn-delete-custom, .btn-like-custom {
+        padding: 5px 12px;
+        font-size: 0.9rem;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-reply-custom {
+        background-color: #e7f1ff;
+        color: #1e90ff;
+        border: 1px solid #1e90ff;
+    }
+
+        .btn-reply-custom:hover {
+            background-color: #1e90ff;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(30, 144, 255, 0.3);
+        }
+
+    .btn-report-custom {
+        background-color: #ffe7e7;
+        color: #ff4d4f;
+        border: 1px solid #ff4d4f;
+    }
+
+        .btn-report-custom:hover {
+            background-color: #ff4d4f;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
+        }
+
+        .btn-report-custom:disabled {
+            background-color: #f1f1f1;
+            color: #999;
+            border-color: #ccc;
+            cursor: not-allowed;
+        }
+
+    .btn-delete-custom {
+        background-color: #ffebeb;
+        color: #dc3545;
+        border: 1px solid #dc3545;
+    }
+
+        .btn-delete-custom:hover {
+            background-color: #dc3545;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        }
+
+    .btn-like-custom {
+        background-color: #e6ffe6;
+        color: #28a745;
+        border: 1px solid #28a745;
+    }
+
+        .btn-like-custom.active {
+            background-color: #28a745;
+            color: #fff;
+            border-color: #28a745;
+            font-weight: bold;
+        }
+
+        .btn-like-custom:hover {
+            background-color: #28a745;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        }
+
+    .reply-form, .report-form {
+        background-color: #f9fafb;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid;
+    }
+
+    .reply-form {
+        border-left-color: #1e90ff;
+    }
+
+    .report-form {
+        border-left-color: #ff4d4f;
+    }
+
+    .reply-label, .report-label {
+        color: #2d3748;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+    }
+
+        .reply-label::before {
+            content: "\f4ab"; /* bi-reply-fill */
+            font-family: "bootstrap-icons";
+            color: #1e90ff;
+            margin-right: 8px;
+        }
+
+        .report-label::before {
+            content: "\f33a"; /* bi-flag-fill */
+            font-family: "bootstrap-icons";
+            color: #ff4d4f;
+            margin-right: 8px;
+        }
+
+    .reply-comment, .report-reason {
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        transition: border-color 0.3s ease;
+    }
+
+        .reply-comment:focus, .report-reason:focus {
+            border-color: #1e90ff;
+            box-shadow: 0 0 5px rgba(30, 144, 255, 0.2);
+        }
+
+    .replies {
+        padding-left: 20px;
+        position: relative;
+    }
+
+        .replies::before {
+            content: "";
+            position: absolute;
+            left: 5px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #1e90ff, transparent);
+        }
+
+    .reply-item {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #f0f7ff;
+        border-radius: 8px;
+        position: relative;
+    }
+
+    .reply-icon {
+        color: #1e90ff;
+        font-size: 1.1rem;
+    }
+
+    .reply-content {
+        background-color: #fff;
+        padding: 8px 12px;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        margin-left: 25px;
+    }
+
+    /* Styles for Submit Review Toggle */
+    .toggle-review-form {
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        .toggle-review-form:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .review-form-container {
+        background-color: #f9fafb;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .delivery-date-btn, .delivery-date-calendar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        width: 120px; /* Fixed width for all buttons */
+        height: 80px; /* Fixed height for all buttons */
+        text-align: center;
+        white-space: normal;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 0.9rem; /* Consistent font size */
+        line-height: 1.2; /* Control line spacing for multi-line text */
+    }
+
+        .delivery-date-btn:hover, .delivery-date-calendar:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .delivery-date-btn.active, .delivery-date-calendar.active {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+            font-weight: bold;
+        }
+
+    #calendarBtnIcon {
+        font-size: 1.2rem; /* Consistent icon size */
+        margin-bottom: 4px; /* Space between icon and text */
+        color: inherit; /* Inherit color from button text */
+    }
+
+    #calendarBtnText {
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+
+    /* Flatpickr Custom Styles */
+    .flatpickr-calendar {
+        font-family: Arial, sans-serif;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+    }
+
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover {
+        background: #007bff;
+        border-color: #007bff;
+        color: #fff;
+    }
+
+    .flatpickr-day.today {
+        border-color: #FF7043;
+        color: #FF7043;
+    }
+
+    .flatpickr-day:hover {
+        background: #e9ecef;
+        border-color: #e9ecef;
+    }
+
+    .flatpickr-day.disabled,
+    .flatpickr-day.disabled:hover {
+        color: #ccc;
+        background: #f8f8f8;
+        border-color: #f8f8f8;
+        cursor: not-allowed;
+    }
+</style>
+
+@section Scripts {
+    <!-- Thêm Flatpickr từ CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Thêm locale tiếng Việt cho Flatpickr -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vi.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <script>
+        console.log('Script loaded');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM loaded');
+
+            // Khởi tạo carousel
+            const carouselElement = document.querySelector('#productCarousel');
+            const carouselItems = document.querySelectorAll('.carousel-item');
+            const prevButton = document.querySelector('.carousel-control-prev');
+            const nextButton = document.querySelector('.carousel-control-next');
+            const thumbnails = document.querySelectorAll('.thumbnail-img');
+
+            const carousel = new bootstrap.Carousel(carouselElement, {
+                interval: 3000,
+                ride: 'carousel',
+                pause: 'hover',
+                wrap: true
+            });
+
+            // Ẩn nút điều hướng nếu chỉ có 1 ảnh
+            if (carouselItems.length <= 1) {
+                if (prevButton) prevButton.style.display = 'none';
+                if (nextButton) nextButton.style.display = 'none';
+            }
+
+            // Xử lý thumbnail
+            thumbnails.forEach((thumb) => {
+                thumb.addEventListener('click', function () {
+                    thumbnails.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    carousel.to(Array.from(thumbnails).indexOf(this));
+                });
+            });
+
+            carouselElement.addEventListener('slid.bs.carousel', function (event) {
+                const activeIndex = event.to;
+                thumbnails.forEach(t => t.classList.remove('active'));
+                if (thumbnails[activeIndex]) thumbnails[activeIndex].classList.add('active');
+            });
+
+            const activeItem = document.querySelector('.carousel-item.active');
+            if (activeItem && thumbnails.length > 0) {
+                const activeIndex = Array.from(carouselItems).indexOf(activeItem);
+                thumbnails.forEach(t => t.classList.remove('active'));
+                if (thumbnails[activeIndex]) thumbnails[activeIndex].classList.add('active');
+            }
+
+            // Xử lý số lượng
+            const quantityInput = document.getElementById('quantity');
+            quantityInput.addEventListener('input', function () {
+                let quantity = parseInt(this.value) || 1;
+                if (quantity < 1) quantity = 1;
+                this.value = quantity;
+                updateButtonQuantities(quantity);
+            });
+
+            // Xử lý popup
+            const continueShoppingPopupBtn = document.getElementById('continueShoppingPopupBtn');
+            const closePopupBtn = document.getElementById('closePopupBtn');
+            const popupElement = document.getElementById('addToCartPopup');
+
+            if (continueShoppingPopupBtn) {
+                continueShoppingPopupBtn.addEventListener('click', () => popupElement.style.display = 'none');
+            }
+            if (closePopupBtn) {
+                closePopupBtn.addEventListener('click', () => popupElement.style.display = 'none');
+            }
+
+            // Xử lý chọn sao
+            initializeStarRating();
+
+            // Xử lý Reply và Report Form Toggle
+            document.querySelectorAll('.reply-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const ratingId = this.getAttribute('data-rating-id');
+                    const replyForm = document.getElementById(`reply-form-${ratingId}`);
+                    const reportForm = document.getElementById(`report-form-${ratingId}`);
+                    replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+                    if (reportForm) reportForm.style.display = 'none';
+                });
+            });
+
+            document.querySelectorAll('.report-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const ratingId = this.getAttribute('data-rating-id');
+                    const reportForm = document.getElementById(`report-form-${ratingId}`);
+                    const replyForm = document.getElementById(`reply-form-${ratingId}`);
+                    if (!button.disabled) {
+                        reportForm.style.display = reportForm.style.display === 'none' ? 'block' : 'none';
+                    }
+                    if (replyForm) replyForm.style.display = 'none';
+                });
+            });
+
+            document.querySelectorAll('.cancel-reply').forEach(button => {
+                button.addEventListener('click', function () {
+                    const ratingId = this.getAttribute('data-rating-id');
+                    document.getElementById(`reply-form-${ratingId}`).style.display = 'none';
+                });
+            });
+
+            document.querySelectorAll('.cancel-report').forEach(button => {
+                button.addEventListener('click', function () {
+                    const ratingId = this.getAttribute('data-rating-id');
+                    document.getElementById(`report-form-${ratingId}`).style.display = 'none';
+                });
+            });
+
+            // Xử lý xóa đánh giá
+            document.querySelectorAll('.delete-rating').forEach(button => {
+                button.addEventListener('click', function () {
+                    const ratingId = this.getAttribute('data-rating-id');
+                    if (confirm('Bạn có chắc muốn xóa đánh giá này?')) {
+                        fetch(`/Product/DeleteRating?ratingId=${ratingId}`, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                document.getElementById(`rating-${ratingId}`).remove();
+                                alert('Đánh giá đã được xóa thành công.');
+                                location.reload(); // Refresh to update average rating and distribution
+                            } else {
+                                alert(data.message || 'Có lỗi xảy ra khi xóa đánh giá.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error deleting rating:', error);
+                            alert('Có lỗi xảy ra khi xóa đánh giá.');
+                        });
+                    }
+                });
+            });
+
+            // Xử lý xóa trả lời
+            document.querySelectorAll('.delete-reply').forEach(button => {
+                button.addEventListener('click', function () {
+                    const replyId = this.getAttribute('data-reply-id');
+                    if (confirm('Bạn có chắc muốn xóa trả lời này?')) {
+                        fetch(`/Product/DeleteReply?replyId=${replyId}`, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                document.getElementById(`reply-${replyId}`).remove();
+                                alert('Trả lời đã được xóa thành công.');
+                            } else {
+                                alert(data.message || 'Có lỗi xảy ra khi xóa trả lời.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error deleting reply:', error);
+                            alert('Có lỗi xảy ra khi xóa trả lời.');
+                        });
+                    }
+                });
+            });
+
+            // Xử lý nút "Hữu ích" (Like) với toggle
+            document.querySelectorAll('.like-btn').forEach(button => {
+                let isLiked = button.getAttribute('data-is-liked') === 'true';
+                let currentLikes = parseInt(button.getAttribute('data-likes') || 0);
+                const likeCountSpan = button.querySelector('.like-count');
+
+                if (isLiked) {
+                    button.classList.add('active');
+                }
+
+                button.addEventListener('click', function () {
+                    const ratingId = this.getAttribute('data-rating-id');
+                    const replyId = this.getAttribute('data-reply-id');
+                    const itemId = ratingId || replyId;
+                    const isRating = !!ratingId;
+
+                    if (!@User.Identity.IsAuthenticated.ToString().ToLower()) {
+                        alert('Vui lòng đăng nhập để thực hiện hành động này.');
+                        return;
+                    }
+
+                    const url = `/Product/${isLiked ? (isRating ? 'UnlikeRating' : 'UnlikeReply') : (isRating ? 'LikeRating' : 'LikeReply')}?itemId=${itemId}`;
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                throw new Error(`HTTP error! Status: ${response.status}, Response: ${text}`);
+                            });
+                        }
+                        return response.json().then(data => {
+                            if (!data) {
+                                throw new Error('No data received from server');
+                            }
+                            return data;
+                        });
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            currentLikes = data.newLikesCount;
+                            isLiked = !isLiked;
+                            button.setAttribute('data-likes', currentLikes);
+                            button.setAttribute('data-is-liked', isLiked.toString());
+                            likeCountSpan.textContent = currentLikes;
+                            button.classList.toggle('active');
+                            console.log(`Toggle successful. isLiked: ${isLiked}, Likes: ${currentLikes}`);
+                        } else {
+                            alert(data.message || 'Không thể thực hiện hành động. Vui lòng thử lại sau.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error liking/unliking item:', error);
+                        alert('Có lỗi xảy ra khi thực hiện hành động: ' + error.message);
+                    });
+                });
+            });
+
+            // Xử lý Toggle Form Gửi Đánh Giá
+            const toggleReviewButton = document.querySelector('.toggle-review-form');
+            const reviewFormContainer = document.querySelector('.review-form-container');
+            const cancelReviewButton = document.querySelector('.cancel-review-form');
+
+            if (toggleReviewButton && reviewFormContainer) {
+                toggleReviewButton.addEventListener('click', function () {
+                    reviewFormContainer.style.display = reviewFormContainer.style.display === 'none' ? 'block' : 'none';
+                });
+            }
+
+            if (cancelReviewButton && reviewFormContainer) {
+                cancelReviewButton.addEventListener('click', function () {
+                    reviewFormContainer.style.display = 'none';
+                });
+            }
+
+            // Xử lý chọn ngày giao hàng
+            const deliveryDateButtons = document.querySelectorAll('.delivery-date-btn');
+            const calendarBtn = document.getElementById('calendarBtn');
+            const calendarBtnText = document.getElementById('calendarBtnText');
+            const calendarBtnIcon = document.getElementById('calendarBtnIcon');
+            const calendarInput = document.getElementById('calendarInput');
+            const selectedDeliveryDate = document.getElementById('selectedDeliveryDate');
+            let selectedDate = '@today.ToString("yyyy-MM-dd")'; // Ngày mặc định là hôm nay
+
+            // Hàm định dạng ngày theo kiểu "DD THÁNG MM\nLABEL"
+            function formatCustomDate(date) {
+                const daysOfWeek = ['CHỦ NHẬT', 'THỨ HAI', 'THỨ BA', 'THỨ TƯ', 'THỨ NĂM', 'THỨ SÁU', 'THỨ BẢY'];
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Reset time for comparison
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+                date.setHours(0, 0, 0, 0); // Reset time for comparison
+
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                let label = daysOfWeek[date.getDay()];
+
+                if (date.getTime() === today.getTime()) {
+                    label = 'HÔM NAY';
+                } else if (date.getTime() === tomorrow.getTime()) {
+                    label = 'NGÀY MAI';
+                }
+
+                return `${day} THÁNG ${month}<br>${label}`;
+            }
+
+            // Hàm định dạng ngày cho selectedDeliveryDate
+            function formatDisplayDate(date) {
+                const daysOfWeek = ['CHỦ NHẬT', 'THỨ HAI', 'THỨ BA', 'THỨ TƯ', 'THỨ NĂM', 'THỨ SÁU', 'THỨ BẢY'];
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+                date.setHours(0, 0, 0, 0);
+
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                let label = daysOfWeek[date.getDay()];
+
+                if (date.getTime() === today.getTime()) {
+                    label = 'HÔM NAY';
+                } else if (date.getTime() === tomorrow.getTime()) {
+                    label = 'NGÀY MAI';
+                }
+
+                return `${day} THÁNG ${month} ${label}`;
+            }
+
+            // Khởi tạo Flatpickr
+            const calendar = flatpickr('#calendarBtn', {
+                dateFormat: 'Y-m-d',
+                minDate: 'today',
+                defaultDate: selectedDate,
+                locale: 'vi',
+                onChange: function (selectedDates, dateStr) {
+                    if (selectedDates.length > 0) {
+                        selectedDate = dateStr;
+                        const displayDate = new Date(selectedDate + 'T00:00:00');
+                        const formattedDate = formatDisplayDate(displayDate);
+                        selectedDeliveryDate.textContent = `Ngày giao hàng: ${formattedDate}`;
+                        deliveryDateButtons.forEach(btn => btn.classList.remove('btn-primary', 'active'));
+                        calendarBtn.classList.add('btn-primary', 'active');
+                        calendarInput.value = selectedDate;
+
+                        // Cập nhật nội dung nút "Lịch" thành ngày đã chọn và xóa icon
+                        calendarBtnText.innerHTML = formatCustomDate(displayDate);
+                        calendarBtnIcon.style.display = 'none';
+                        calendarBtn.setAttribute('data-date', selectedDate);
+                        updateDeliveryTimes(selectedDate);
+                    }
+                }
+            });
+
+            deliveryDateButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    deliveryDateButtons.forEach(btn => btn.classList.remove('btn-primary', 'active'));
+                    calendarBtn.classList.remove('btn-primary', 'active');
+                    this.classList.add('btn-primary', 'active');
+                    selectedDate = this.getAttribute('data-date');
+                    const displayDate = new Date(selectedDate + 'T00:00:00');
+                    const formattedDate = formatDisplayDate(displayDate);
+                    selectedDeliveryDate.textContent = `Ngày giao hàng: ${formattedDate}`;
+                    calendar.setDate(selectedDate);
+                    calendarInput.value = selectedDate;
+
+                    // Reset nút "Lịch" về trạng thái ban đầu
+                    calendarBtnText.innerHTML = 'Lịch';
+                    calendarBtnIcon.style.display = 'inline-block';
+                    calendarBtn.setAttribute('data-date', '');
+                    updateDeliveryTimes(selectedDate);
+                });
+            });
+
+            // Hiển thị ngày mặc định khi tải trang
+            const defaultDate = new Date(selectedDate + 'T00:00:00');
+            const formattedDefaultDate = formatDisplayDate(defaultDate);
+            selectedDeliveryDate.textContent = `Ngày giao hàng: ${formattedDefaultDate}`;
+            deliveryDateButtons[0].classList.add('btn-primary', 'active');
+            calendarInput.value = selectedDate;
+
+            // Xử lý chọn thời gian giao hàng
+            const deliveryTimeOptions = document.querySelector('.delivery-time-options');
+            const timeButtons = Array.from(document.querySelectorAll('.delivery-time-btn'));
+            const selectedDeliveryTime = document.getElementById('selectedDeliveryTime');
+            let selectedTime = '';
+
+            timeButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    timeButtons.forEach(btn => btn.classList.remove('btn-primary', 'active'));
+                    this.classList.add('btn-primary', 'active');
+                    selectedTime = this.getAttribute('data-time');
+                    selectedDeliveryTime.textContent = `Thời gian giao hàng: ${this.textContent}`;
+                });
+            });
+
+            function updateDeliveryTimes(selectedDate) {
+                const today = new Date(); 
+                const isToday = selectedDate === today.toISOString().split('T')[0];
+                const currentHour = today.getHours();
+                const currentMinute = today.getMinutes();
+                const currentTime = currentHour + (currentMinute / 60);
+
+                // Reset hiển thị các nút thời gian
+                timeButtons.forEach(button => {
+                    button.style.display = 'inline-block'; // Hiển thị lại tất cả trước khi kiểm tra
+                });
+
+                // Nếu là hôm nay, ẩn các khung giờ đã qua
+                if (isToday) {
+                    timeButtons.forEach(button => {
+                        const timeRange = button.getAttribute('data-time').split('-');
+                        const startTime = parseInt(timeRange[0].split(':')[0]) + (parseInt(timeRange[0].split(':')[1]) / 60);
+                        const endTime = parseInt(timeRange[1].split(':')[0]) + (parseInt(timeRange[1].split(':')[1]) / 60);
+
+                        // Ẩn khung giờ nếu thời gian hiện tại vượt qua khung giờ đó
+                        if (currentTime >= endTime) {
+                            button.style.display = 'none';
+                        }
+                    });
+                }
+
+                // Kiểm tra nếu không còn khung giờ nào hiển thị
+                const visibleTimeButtons = timeButtons.filter(btn => btn.style.display !== 'none');
+                if (visibleTimeButtons.length === 0) {
+                    selectedDeliveryTime.textContent = 'Không có khung giờ khả dụng cho ngày này.';
+                    deliveryTimeOptions.style.display = 'none';
+                } else {
+                    deliveryTimeOptions.style.display = 'flex';
+                    // Nếu không còn khung giờ nào đã chọn, reset lựa chọn
+                    if (!visibleTimeButtons.some(btn => btn.getAttribute('data-time') === selectedTime)) {
+                        selectedTime = '';
+                        selectedDeliveryTime.textContent = '';
+                        timeButtons.forEach(btn => btn.classList.remove('btn-primary', 'active'));
+                    }
+                }
+            }
+
+                // Khởi tạo thời gian giao hàng dựa trên ngày hiện tại
+                updateDeliveryTimes(selectedDate);
+            });
+
+            function updateQuantity(change) {
+                const quantityInput = document.getElementById('quantity');
+                let quantity = parseInt(quantityInput.value) || 1;
+                quantity += change;
+                if (quantity < 1) quantity = 1;
+                quantityInput.value = quantity;
+                updateButtonQuantities(quantity);
+            }
+
+            function updateButtonQuantities(quantity) {
+                const addToCartBtn = document.querySelector('.add-to-cart-btn');
+                const buyNowBtn = document.querySelector('.buy-now-btn');
+                addToCartBtn.setAttribute('data-quantity', quantity);
+                buyNowBtn.setAttribute('asp-route-quantity', quantity);
+            }
+
+            function addToCart(productId) {
+                const quantity = document.getElementById('quantity').value;
+                const deliveryDate = document.getElementById('calendarInput').value;
+                const deliveryTime = document.querySelector('.delivery-time-btn.btn-primary.active')?.getAttribute('data-time') || '';
+                const popupElement = document.getElementById('addToCartPopup');
+                const popupQuantity = document.getElementById('popupProductQuantity');
+
+                console.log('Adding to cart with:', { productId, quantity, deliveryDate, deliveryTime });
+
+                if (!deliveryTime) {
+                    alert('Vui lòng chọn khung giờ giao hàng.');
+                    return;
+                }
+
+                popupQuantity.textContent = quantity;
+
+                const url = `/ShoppingCart/AddToCart?productId=${productId}&quantity=${quantity}&deliveryDate=${deliveryDate}&deliveryTime=${encodeURIComponent(deliveryTime)}`;
+                console.log('Request URL:', url);
+
+                fetch(url, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => {
+                    console.log('Response Status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response Data:', data);
+                    if (data.success) {
+                        console.log('Added to cart successfully');
+                        popupElement.style.display = 'flex';
+                        const cartCountElement = document.querySelector('#cartCount');
+                        if (cartCountElement && data.cartCount !== undefined) {
+                            cartCountElement.textContent = data.cartCount;
+                        }
+                    } else {
+                        alert(data.message || 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding to cart:', error);
+                    alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!');
+                });
+            }
+
+            function buyNow(productId) {
+                const quantityInput = document.getElementById('quantity');
+                const quantity = parseInt(quantityInput.value);
+                const variant = document.getElementById('variant').value;
+                const deliveryDate = document.getElementById('calendarInput').value; // Lấy ngày giao hàng
+                const deliveryTime = document.querySelector('.delivery-time-btn.btn-primary.active')?.getAttribute('data-time') || ''; // Lấy thời gian giao hàng
+
+                // Kiểm tra nếu chưa chọn thời gian giao hàng
+                if (!deliveryTime) {
+                    alert('Vui lòng chọn khung giờ giao hàng.');
+                    return;
+                }
+
+                fetch(`/ShoppingCart/AddToCart?productId=${productId}&quantity=${quantity}&variant=${variant}&deliveryDate=${deliveryDate}&deliveryTime=${encodeURIComponent(deliveryTime)}`, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = '@Url.Action("Checkout", "Order")';
+                        } else {
+                            alert(data.message || 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error adding to cart:', error);
+                        alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!');
+                    });
+            }
+
+            function initializeStarRating() {
+                const stars = document.querySelectorAll('.star-rating-input .star');
+                const starInput = document.getElementById('starRating');
+                const starError = document.getElementById('starError');
+                const form = document.querySelector('form');
+
+                console.log('Stars found:', stars.length);
+                if (stars.length === 0) {
+                    console.error('No star elements found. Check HTML render.');
+                    return;
+                }
+                if (!starInput) {
+                    console.error('Star input not found. Check if #starRating exists.');
+                    return;
+                }
+                if (!starError) {
+                    console.error('Star error element not found. Check if #starError exists.');
+                    return;
+                }
+                if (!form) {
+                    console.error('Form not found. Check form element.');
+                    return;
+                }
+
+                stars.forEach(star => {
+                    star.addEventListener('click', function () {
+                        const value = parseInt(this.getAttribute('data-value'));
+                        if (isNaN(value)) {
+                            console.error('Invalid data-value:', this.getAttribute('data-value'));
+                            return;
+                        }
+                        starInput.value = value;
+                        stars.forEach(s => s.classList.remove('active'));
+                        for (let i = 0; i < value; i++) {
+                            if (stars[i]) stars[i].classList.add('active');
+                        }
+                        starError.style.display = 'none';
+                        console.log('Star clicked, value set to:', value);
+                    });
+
+                    star.addEventListener('mousedown', () => console.log('Star mousedown:', star.getAttribute('data-value')));
+                });
+
+                form.addEventListener('submit', function (e) {
+                    if (starInput.value == 0 || starInput.value === '0') {
+                        e.preventDefault();
+                        starError.style.display = 'block';
+                        console.log('Form submission blocked: No star selected');
+                    } else {
+                        console.log('Form submitted with rating:', starInput.value);
+                    }
+                });
+            }
+    </script>
+}

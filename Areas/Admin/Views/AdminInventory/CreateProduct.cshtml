@@ -1,0 +1,120 @@
+﻿@* @model Bloomie.Models.ViewModels.CreateProductViewModel *@
+
+@* @{ *@
+@*     ViewData["Title"] = "Tạo sản phẩm mới"; *@
+@*     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml"; *@
+@* } *@
+
+@* <h2>Tạo sản phẩm mới</h2> *@
+
+@* @if (TempData["SuccessMessage"] != null) *@
+@* { *@
+@*     <div class="alert alert-success">@TempData["SuccessMessage"]</div> *@
+@* } *@
+@* @if (TempData["ErrorMessage"] != null) *@
+@* { *@
+@*     <div class="alert alert-danger">@TempData["ErrorMessage"]</div> *@
+@* } *@
+
+@* <form asp-action="CreateProduct" method="post"> *@
+@*     <input type="hidden" name="currentPage" value="@ViewData["CurrentPage"]" /> *@
+
+@*     <div class="form-group"> *@
+@*         <label asp-for="Product.Name">Tên sản phẩm</label> *@
+@*         <input asp-for="Product.Name" class="form-control" required /> *@
+@*         <span asp-validation-for="Product.Name" class="text-danger"></span> *@
+@*     </div> *@
+
+@*     <div class="form-group"> *@
+@*         <label asp-for="Product.CategoryId">Danh mục</label> *@
+@*         <select asp-for="Product.CategoryId" class="form-control" required> *@
+@*             <option value="">Chọn danh mục</option> *@
+@*             @if (ViewData["Categories"] is IEnumerable<dynamic> categories && categories.Any()) *@
+@*             { *@
+@*                 @foreach (var category in categories) *@
+@*                 { *@
+@*                     <option value="@category.Id">@category.Name</option> *@
+@*                 } *@
+@*             } *@
+@*         </select> *@
+@*         <span asp-validation-for="Product.CategoryId" class="text-danger"></span> *@
+@*     </div> *@
+
+@*     <div class="form-group"> *@
+@*         <label asp-for="Product.Price">Giá bán</label> *@
+@*         <input asp-for="Product.Price" class="form-control" type="number" step="0.01" min="0" required /> *@
+@*         <span asp-validation-for="Product.Price" class="text-danger"></span> *@
+@*     </div> *@
+
+@*     <div class="form-group"> *@
+@*         <label asp-for="Product.Quantity">Số lượng sản phẩm</label> *@
+@*         <input asp-for="Product.Quantity" class="form-control" type="number" min="1" required /> *@
+@*         <span asp-validation-for="Product.Quantity" class="text-danger"></span> *@
+@*     </div> *@
+
+@*     <div class="form-group"> *@
+@*         <label asp-for="Product.LowStockThreshold">Ngưỡng tồn kho thấp</label> *@
+@*         <input asp-for="Product.LowStockThreshold" class="form-control" type="number" min="0" required /> *@
+@*         <span asp-validation-for="Product.LowStockThreshold" class="text-danger"></span> *@
+@*     </div> *@
+
+@*     <div class="form-group"> *@
+@*         <label>Thành phần (Loại hoa và số lượng mỗi sản phẩm)</label> *@
+@*         <div id="flowerTypeQuantities"> *@
+@*             @for (int i = 0; i < Model.FlowerTypeQuantities.Count; i++) *@
+@*             { *@
+@*                 <div class="flower-type-entry mb-2"> *@
+@*                     <select name="FlowerTypeQuantities[@i].FlowerTypeId" class="form-control d-inline-block w-50" required> *@
+@*                         <option value="">Chọn loại hoa</option> *@
+@*                         @if (ViewData["FlowerTypes"] is IEnumerable<dynamic> flowerTypes && flowerTypes.Any()) *@
+@*                         { *@
+@*                             @foreach (var ft in flowerTypes) *@
+@*                             { *@
+@*                                 <option value="@ft.Id" selected="@(Model.FlowerTypeQuantities[i].FlowerTypeId == ft.Id ? "selected" : null)">@ft.Name</option> *@
+@*                             } *@
+@*                         } *@
+@*                     </select> *@
+@*                     <input type="number" name="FlowerTypeQuantities[@i].Quantity" class="form-control d-inline-block w-25" min="1" value="@Model.FlowerTypeQuantities[i].Quantity" required placeholder="Số lượng" /> *@
+@*                     <button type="button" class="btn btn-danger btn-sm remove-flower-type">Xóa</button> *@
+@*                 </div> *@
+@*             } *@
+@*         </div> *@
+@*         <button type="button" id="addFlowerType" class="btn btn-secondary mt-2">Thêm loại hoa</button> *@
+@*     </div> *@
+
+@*     <button type="submit" class="btn btn-primary">Tạo sản phẩm</button> *@
+@*     <a asp-action="Index" asp-route-pageNumber="@ViewData["CurrentPage"]" class="btn btn-secondary">Quay lại</a> *@
+@* </form> *@
+
+@* @section Scripts { *@
+@*     <partial name="_ValidationScriptsPartial" /> *@
+@*     <script> *@
+@*         document.getElementById("addFlowerType").addEventListener("click", function () { *@
+@*             var container = document.getElementById("flowerTypeQuantities"); *@
+@*             var index = container.children.length; *@
+@*             var newEntry = document.createElement("div"); *@
+@*             newEntry.className = "flower-type-entry mb-2"; *@
+@*             newEntry.innerHTML = ` *@
+@*                 <select name="FlowerTypeQuantities[${index}].FlowerTypeId" class="form-control d-inline-block w-50" required> *@
+@*                     <option value="">Chọn loại hoa</option> *@
+@*         @if (ViewData["FlowerTypes"] is IEnumerable<dynamic> flowerTypes && flowerTypes.Any()) *@
+@*         { *@
+@*             @foreach (var ft in flowerTypes) *@
+@*             { *@
+@*                 <option value="@ft.Id">@ft.Name</option> *@
+@*             } *@
+@*         } *@
+@*                 </select> *@
+@*                 <input type="number" name="FlowerTypeQuantities[${index}].Quantity" class="form-control d-inline-block w-25" min="1" required placeholder="Số lượng" /> *@
+@*                 <button type="button" class="btn btn-danger btn-sm remove-flower-type">Xóa</button> *@
+@*             `; *@
+@*             container.appendChild(newEntry); *@
+@*         }); *@
+
+@*         document.getElementById("flowerTypeQuantities").addEventListener("click", function (e) { *@
+@*             if (e.target.classList.contains("remove-flower-type")) { *@
+@*                 e.target.parentElement.remove(); *@
+@*             } *@
+@*         }); *@
+@*     </script> *@
+@* } *@

@@ -1,0 +1,534 @@
+﻿@model Bloomie.Models.Entities.Order
+
+@{
+    ViewData["Title"] = "Quản lý doanh thu";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid mt-2 p-0">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <!-- Tiêu đề chính -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-dark">
+                    <i class="fas fa-chart-line text-primary me-2"></i> Quản lý doanh thu
+                </h2>
+                <span class="badge bg-primary text-white p-2">
+                    <i class="fas fa-calendar me-2"></i> @DateTime.Now.ToString("dd/MM/yyyy")
+                </span>
+            </div>
+
+            <!-- Bộ lọc và thống kê -->
+            <div class="mb-4">
+                <div class="row">
+                    <div class="col-md-2 col-sm-12 mb-3">
+                        <div class="stat-card p-3 text-center">
+                            <h6 class="text-muted mb-2">Tổng Doanh Thu Bán</h6>
+                            <h3 id="totalSalesRevenue" class="fw-bold text-primary">0 đ</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-12 mb-3">
+                        <div class="stat-card p-3 text-center">
+                            <h6 class="text-muted mb-2">Số Lượng Bán Ra</h6>
+                            <h3 id="totalItemsSold" class="fw-bold text-primary">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-12 mb-3">
+                        <div class="stat-card p-3 text-center">
+                            <h6 class="text-muted mb-2">Tổng Doanh Thu Nhập</h6>
+                            <h3 id="totalImportRevenue" class="fw-bold text-success">0 đ</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-12 mb-3">
+                        <div class="stat-card p-3 text-center">
+                            <h6 class="text-muted mb-2">Số Lượng Nhập</h6>
+                            <h3 id="totalItemsImported" class="fw-bold text-success">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-12 mb-3">
+                        <div class="stat-card p-3 text-center">
+                            <h6 class="text-muted mb-2">Doanh Thu Tuần</h6>
+                            <h3 id="totalWeeklyRevenue" class="fw-bold text-info">0 đ</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-12 mb-3">
+                        <div class="stat-card p-3 text-center">
+                            <h6 class="text-muted mb-2">Số Lượng Tuần</h6>
+                            <h3 id="totalWeeklyItems" class="fw-bold text-info">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="fw-bold text-dark mb-3"><i class="fas fa-filter me-2"></i> Bộ Lọc Doanh Thu</h4>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="d-flex flex-wrap gap-3 align-items-center">
+                            <div class="d-flex align-items-center">
+                                <label for="yearSelect" class="fw-semibold text-dark me-2">Năm:</label>
+                                <select id="yearSelect" class="form-control">
+                                    @for (int i = DateTime.Now.Year; i >= DateTime.Now.Year - 5; i--)
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <label for="monthSelect" class="fw-semibold text-dark me-2">Tháng:</label>
+                                <select id="monthSelect" class="form-control">
+                                    <option value="0">Tất cả</option>
+                                    @for (int i = 1; i <= 12; i++)
+                                    {
+                                        <option value="@i">Tháng @i</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <label for="chartType" class="fw-semibold text-dark me-2">Loại Biểu Đồ:</label>
+                                <select id="chartType" class="form-control">
+                                    <option value="bar">Cột</option>
+                                    <option value="line">Đường</option>
+                                </select>
+                            </div>
+                            <button id="exportBtn" class="btn btn-success btn-sm shadow-sm">
+                                <i class="fas fa-file-export me-2"></i> Xuất Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Biểu đồ doanh thu -->
+            <div class="chart-container mb-4">
+                <canvas id="revenueChart" height="400"></canvas>
+            </div>
+
+            <!-- Bảng chi tiết doanh thu -->
+            <div class="table-responsive">
+                <h4 class="fw-bold text-dark mb-3"><i class="fas fa-table me-2"></i> Chi Tiết Doanh Thu</h4>
+                <table class="table table-hover table-bordered mb-0" id="revenueTable">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th class="col-period">Thời Gian</th>
+                            <th class="col-revenue">Doanh Thu Bán</th>
+                            <th class="col-items">Số Lượng Bán</th>
+                            <th class="col-revenue">Doanh Thu Nhập</th>
+                            <th class="col-items">Số Lượng Nhập</th>
+                            <th class="col-revenue">Doanh Thu Tuần</th>
+                            <th class="col-items">Số Lượng Tuần</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dữ liệu sẽ được điền bởi JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let ctx = document.getElementById("revenueChart").getContext("2d");
+        let revenueChart;
+        let revenueData = [];
+
+        // Hàm tải dữ liệu và vẽ biểu đồ
+        function loadRevenueChart(year, month, chartType = 'bar') {
+            const chartContainer = document.querySelector('.chart-container');
+            chartContainer.classList.add('loading');
+
+            fetch(`/Admin/AdminRevenue/GetRevenue?year=${year}&month=${month}`)
+                .then(response => response.json())
+                .then(data => {
+                    revenueData = data;
+                    let labels = data.map(d => month == 0 ? `Tháng ${d.month}` : `Ngày ${d.date}`);
+                    let salesRevenues = data.map(d => d.totalSalesRevenue);
+                    let importRevenues = data.map(d => d.totalImportRevenue);
+                    let weeklyRevenues = data.map(d => d.totalWeeklyRevenue);
+                    let itemsSold = data.map(d => d.totalItemsSold);
+                    let itemsImported = data.map(d => d.totalItemsImported);
+                    let weeklyItems = data.map(d => d.totalWeeklyItems);
+
+                    // Tính tổng
+                    let totalSalesRevenue = salesRevenues.reduce((sum, value) => sum + value, 0);
+                    let totalItemsSold = itemsSold.reduce((sum, value) => sum + value, 0);
+                    let totalImportRevenue = importRevenues.reduce((sum, value) => sum + value, 0);
+                    let totalItemsImported = itemsImported.reduce((sum, value) => sum + value, 0);
+                    let totalWeeklyRevenue = weeklyRevenues.reduce((sum, value) => sum + value, 0);
+                    let totalWeeklyItems = weeklyItems.reduce((sum, value) => sum + value, 0);
+
+                    document.getElementById('totalSalesRevenue').textContent = totalSalesRevenue.toLocaleString('vi-VN') + ' đ';
+                    document.getElementById('totalItemsSold').textContent = totalItemsSold.toLocaleString('vi-VN');
+                    document.getElementById('totalImportRevenue').textContent = totalImportRevenue.toLocaleString('vi-VN') + ' đ';
+                    document.getElementById('totalItemsImported').textContent = totalItemsImported.toLocaleString('vi-VN');
+                    document.getElementById('totalWeeklyRevenue').textContent = totalWeeklyRevenue.toLocaleString('vi-VN') + ' đ';
+                    document.getElementById('totalWeeklyItems').textContent = totalWeeklyItems.toLocaleString('vi-VN');
+
+                    // Cập nhật bảng chi tiết
+                    const tbody = document.querySelector('#revenueTable tbody');
+                    tbody.innerHTML = '';
+                    data.forEach(item => {
+                        const period = month == 0 ? `Tháng ${item.month}` : `Ngày ${item.date}`;
+                        const salesRevenue = item.totalSalesRevenue.toLocaleString('vi-VN') + ' đ';
+                        const itemsSold = item.totalItemsSold;
+                        const importRevenue = item.totalImportRevenue.toLocaleString('vi-VN') + ' đ';
+                        const itemsImported = item.totalItemsImported;
+                        const weeklyRevenue = item.totalWeeklyRevenue.toLocaleString('vi-VN') + ' đ';
+                        const weeklyItems = item.totalWeeklyItems;
+                        const row = `
+                            <tr>
+                                <td>${period}</td>
+                                <td class="revenue-cell">${salesRevenue}</td>
+                                <td>${itemsSold}</td>
+                                <td class="revenue-cell">${importRevenue}</td>
+                                <td>${itemsImported}</td>
+                                <td class="revenue-cell">${weeklyRevenue}</td>
+                                <td>${weeklyItems}</td>
+                            </tr>
+                        `;
+                        tbody.insertAdjacentHTML('beforeend', row);
+                    });
+
+                    if (revenueChart) {
+                        revenueChart.destroy();
+                    }
+
+                    revenueChart = new Chart(ctx, {
+                        type: chartType,
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: "Doanh Thu Bán (VNĐ)",
+                                    data: salesRevenues,
+                                    backgroundColor: chartType === 'bar' ? "rgba(37, 99, 235, 0.8)" : "transparent",
+                                    borderColor: "rgba(37, 99, 235, 1)",
+                                    borderWidth: chartType === 'line' ? 2 : 1,
+                                    fill: chartType === 'line',
+                                    tension: 0.4,
+                                    pointBackgroundColor: "rgba(37, 99, 235, 1)",
+                                    pointBorderColor: "#fff",
+                                    pointHoverBackgroundColor: "#fff",
+                                    pointHoverBorderColor: "rgba(37, 99, 235, 1)"
+                                },
+                                {
+                                    label: "Doanh Thu Nhập (VNĐ)",
+                                    data: importRevenues,
+                                    backgroundColor: chartType === 'bar' ? "rgba(40, 167, 69, 0.8)" : "transparent",
+                                    borderColor: "rgba(40, 167, 69, 1)",
+                                    borderWidth: chartType === 'line' ? 2 : 1,
+                                    fill: chartType === 'line',
+                                    tension: 0.4,
+                                    pointBackgroundColor: "rgba(40, 167, 69, 1)",
+                                    pointBorderColor: "#fff",
+                                    pointHoverBackgroundColor: "#fff",
+                                    pointHoverBorderColor: "rgba(40, 167, 69, 1)"
+                                },
+                                {
+                                    label: "Doanh Thu Tuần (VNĐ)",
+                                    data: weeklyRevenues,
+                                    backgroundColor: chartType === 'bar' ? "rgba(255, 193, 7, 0.8)" : "transparent",
+                                    borderColor: "rgba(255, 193, 7, 1)",
+                                    borderWidth: chartType === 'line' ? 2 : 1,
+                                    fill: chartType === 'line',
+                                    tension: 0.4,
+                                    pointBackgroundColor: "rgba(255, 193, 7, 1)",
+                                    pointBorderColor: "#fff",
+                                    pointHoverBackgroundColor: "#fff",
+                                    pointHoverBorderColor: "rgba(255, 193, 7, 1)"
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value.toLocaleString('vi-VN') + ' đ';
+                                        }
+                                    },
+                                    grid: {
+                                        color: "rgba(0, 0, 0, 0.05)"
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    labels: {
+                                        font: { size: 14 }
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                    titleFont: { size: 14 },
+                                    bodyFont: { size: 12 },
+                                    callbacks: {
+                                        label: function(context) {
+                                            let datasetLabel = context.dataset.label || '';
+                                            let value = context.parsed.y.toLocaleString('vi-VN') + ' đ';
+                                            let index = context.dataIndex;
+                                            if (datasetLabel.includes("Bán")) {
+                                                let items = itemsSold[index];
+                                                return [`${datasetLabel}: ${value}`, `Số Lượng Bán: ${items}`];
+                                            } else if (datasetLabel.includes("Nhập")) {
+                                                let items = itemsImported[index];
+                                                return [`${datasetLabel}: ${value}`, `Số Lượng Nhập: ${items}`];
+                                            } else {
+                                                let items = weeklyItems[index];
+                                                return [`${datasetLabel}: ${value}`, `Số Lượng Tuần: ${items}`];
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            animation: {
+                                duration: 1000,
+                                easing: 'easeOutQuart'
+                            }
+                        }
+                    });
+
+                    chartContainer.classList.remove('loading');
+                })
+                .catch(error => {
+                    console.error('Lỗi khi tải dữ liệu:', error);
+                    chartContainer.classList.remove('loading');
+                    alert('Có lỗi xảy ra khi tải dữ liệu!');
+                });
+        }
+
+        // Hàm cập nhật biểu đồ
+        function updateChart() {
+            let year = document.getElementById("yearSelect").value;
+            let month = document.getElementById("monthSelect").value;
+            let chartType = document.getElementById("chartType").value;
+            loadRevenueChart(year, month, chartType);
+        }
+
+        // Sự kiện thay đổi bộ lọc
+        document.getElementById("yearSelect").addEventListener("change", updateChart);
+        document.getElementById("monthSelect").addEventListener("change", updateChart);
+        document.getElementById("chartType").addEventListener("change", updateChart);
+
+        // Xuất báo cáo
+        document.getElementById("exportBtn").addEventListener("click", function () {
+            let year = document.getElementById("yearSelect").value;
+            let month = document.getElementById("monthSelect").value;
+            window.location.href = `/Admin/AdminRevenue/ExportRevenue?year=${year}&month=${month}`;
+            setTimeout(() => alert('Báo cáo đã được xuất thành công!'), 500);
+        });
+
+        // Tải dữ liệu mặc định ngay khi truy cập trang
+        const defaultYear = @DateTime.Now.Year;
+        loadRevenueChart(defaultYear, 0, 'bar');
+    });
+</script>
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #60a5fa;
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+    }
+
+    h2, h4, h6 {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h4 {
+        font-size: 1.25rem;
+    }
+
+    h6 {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        padding: 8px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        max-width: 150px;
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+    .badge {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        border-radius: 12px;
+    }
+
+    .stat-card {
+        border-radius: 8px;
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+    }
+
+        .stat-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 6px rgba(37, 99, 235, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .stat-card h3 {
+            font-size: 1.5rem;
+        }
+
+    label {
+        font-size: 0.9rem;
+        color: var(--text-dark);
+        font-weight: 500;
+    }
+
+    .chart-container {
+        position: relative;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+
+        .chart-container.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--primary-color);
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+
+    canvas {
+        max-height: 400px;
+        width: 100% !important;
+    }
+
+    .table {
+        background-color: #ffffff;
+        border-radius: 8px;
+        table-layout: fixed;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+        .table th, .table td {
+            border-color: #e5e7eb;
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    .col-period {
+        width: 15%;
+        min-width: 120px;
+    }
+
+    .col-revenue {
+        width: 20%;
+        min-width: 150px;
+    }
+
+    .col-items {
+        width: 15%;
+        min-width: 100px;
+    }
+
+    .revenue-cell {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+</style>

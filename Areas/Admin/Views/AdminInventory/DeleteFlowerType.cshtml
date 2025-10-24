@@ -1,0 +1,97 @@
+﻿@model Bloomie.Models.Entities.FlowerType
+
+@{
+    ViewData["Title"] = "Xác nhận xóa loại hoa";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    int currentPage = ViewData["CurrentPage"] != null ? (int)ViewData["CurrentPage"] : 1;
+}
+
+<div class="container-fluid mt-2 p-0">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h2 class="fw-bold text-dark mb-4">
+                <i class="fas fa-leaf text-primary me-2"></i> Xác nhận xóa loại hoa
+            </h2>
+
+            <p>Bạn có chắc chắn muốn xóa loại hoa <strong>@Model.Name</strong> không?</p>
+            <p class="text-danger">Hành động này không thể hoàn tác và sẽ xóa tất cả dữ liệu liên quan đến loại hoa này.</p>
+
+            <form asp-action="DeleteFlowerTypeConfirmed" method="post">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" name="pageNumber" value="@currentPage" />
+                <button type="submit" class="btn btn-danger me-2">
+                    <i class="fas fa-trash me-2"></i> Xóa
+                </button>
+                <a asp-action="FlowerTypes" asp-route-pageNumber="@currentPage" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i> Hủy
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #60a5fa;
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+    }
+
+    h2 {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .btn-danger {
+        background-color: #ef4444;
+        border-color: #ef4444;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+            border-color: #dc2626;
+            transform: translateY(-1px);
+        }
+
+    .btn-secondary {
+        background-color: #6b7280;
+        border-color: #6b7280;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+            border-color: #4b5563;
+            transform: translateY(-1px);
+        }
+</style>

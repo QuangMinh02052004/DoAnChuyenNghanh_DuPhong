@@ -1,0 +1,305 @@
+﻿@using System.Web
+@model Bloomie.Models.Entities.Product
+
+@{
+    ViewData["Title"] = "Product Details";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    int currentPage = ViewData["CurrentPage"] != null ? (int)ViewData["CurrentPage"] : 1;
+}
+
+<div class="container-fluid mt-4">
+    <!-- Card chứa thông tin sản phẩm -->
+    <div class="card shadow-sm delete-container">
+        <div class="card-body">
+            <div class="row align-items-start">
+                <!-- Cột hiển thị ảnh (bên trái) -->
+                <div class="col-md-6 product-image">
+                    <div id="productCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000">
+                        <div class="carousel-inner">
+                            <!-- Hiển thị ảnh chính -->
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <div class="carousel-item active">
+                                    <div class="image-container">
+                                        <img src="@Model.ImageUrl" class="carousel-img img-thumbnail" alt="Main Image">
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Hiển thị ảnh bổ sung -->
+                            @if (Model.Images != null && Model.Images.Any())
+                            {
+                                var isFirst = string.IsNullOrEmpty(Model.ImageUrl); // Nếu không có ảnh chính, ảnh bổ sung đầu tiên sẽ là active
+                                @foreach (var image in Model.Images)
+                                {
+                                    <div class="carousel-item @(isFirst ? "active" : "")">
+                                        <div class="image-container">
+                                            <img src="@image.Url" class="carousel-img img-thumbnail" alt="Additional Image">
+                                        </div>
+                                    </div>
+                                    isFirst = false;
+                                }
+                            }
+                        </div>
+
+                        <!-- Điều hướng Carousel -->
+                        @if ((Model.ImageUrl != null && Model.ImageUrl.Any()) || (Model.Images != null && Model.Images.Count > 1))
+                        {
+                            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- Cột thông tin sản phẩm (bên phải) -->
+                <div class="col-md-6 product-info">
+                    <div class="info-card">
+                        <h3 class="mb-3 fw-bold">Thông tin sản phẩm</h3>
+                        <div class="info-item mb-3">
+                            <strong>Mã sản phẩm:</strong> @Model.Id
+                        </div>
+                        <div class="info-item mb-3">
+                            <strong>Tên sản phẩm:</strong> @Model.Name
+                        </div>
+                        <div class="info-item mb-3">
+                            <strong>Giá:</strong> <span class="price-cell" data-price="@Model.Price">@Model.Price đ</span>
+                        </div>
+                        <div class="info-item mb-3">
+                            <strong>Mô tả:</strong>
+                            <div class="description-content">
+                                @if (!string.IsNullOrEmpty(Model.Description))
+                                {
+                                    // Giải mã HTML entities và hiển thị nội dung dưới dạng HTML
+                                    var decodedDescription = System.Net.WebUtility.HtmlDecode(Model.Description);
+                                    @Html.Raw(decodedDescription)
+                                }
+                                else
+                                {
+                                    <p class="mb-1">Không có mô tả có sẵn.</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group text-center mt-4">
+                <a asp-action="Index" asp-route-pageNumber="@currentPage" class="btn btn-outline-secondary">Quay trở lại</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Tùy chỉnh tiêu đề */
+    h1 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 600;
+        color: #4682B4;
+    }
+
+    /* Tùy chỉnh container */
+    .delete-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    /* Tùy chỉnh card */
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-body {
+        padding: 30px;
+    }
+
+    /* Tùy chỉnh hàng chứa hai cột để đảm bảo ngang hàng */
+    .row {
+        display: flex;
+        align-items: stretch; /* Đảm bảo hai cột có chiều cao bằng nhau */
+    }
+
+    /* Tùy chỉnh cột ảnh (bên trái) */
+    .product-image {
+        display: flex;
+        align-items: center; /* Căn giữa theo chiều dọc */
+        justify-content: center; /* Căn giữa theo chiều ngang */
+        height: 400px; /* Chiều cao cố định cho cột ảnh */
+        padding: 0; /* Loại bỏ padding thừa */
+    }
+
+    .carousel {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        width: 100%;
+        height: 100%; /* Đảm bảo carousel chiếm toàn bộ chiều cao của .product-image */
+        max-width: 500px; /* Giới hạn chiều rộng tối đa của carousel */
+    }
+
+    .carousel-inner {
+        height: 100%; /* Đảm bảo carousel-inner khớp với carousel */
+    }
+
+    .carousel-item {
+        height: 100%; /* Đảm bảo mỗi item khớp với carousel-inner */
+        display: flex;
+        align-items: center; /* Căn giữa theo chiều dọc */
+        justify-content: center; /* Căn giữa theo chiều ngang */
+    }
+
+    .image-container {
+        display: flex;
+        align-items: center; /* Căn giữa theo chiều dọc */
+        justify-content: center; /* Căn giữa theo chiều ngang */
+        width: 100%;
+        height: 100%;
+        padding: 10px; /* Khoảng cách nhỏ để tránh ảnh sát viền */
+    }
+
+    .carousel-img {
+        max-width: 100%; /* Đảm bảo ảnh không vượt quá chiều rộng của container */
+        max-height: 100%; /* Đảm bảo ảnh không vượt quá chiều cao của container */
+        width: auto; /* Cho phép ảnh tự điều chỉnh chiều rộng */
+        height: auto; /* Cho phép ảnh tự điều chỉnh chiều cao */
+        object-fit: contain; /* Giữ tỷ lệ ảnh và hiển thị toàn bộ */
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .carousel-img:hover {
+            border-color: #4682B4;
+            box-shadow: 0 0 8px rgba(70, 130, 180, 0.3);
+            transform: scale(1.02);
+        }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: #4682B4;
+        border-radius: 50%;
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .carousel-control-prev:hover .carousel-control-prev-icon,
+    .carousel-control-next:hover .carousel-control-next-icon {
+        background-color: #2F5A78;
+        transform: scale(1.1);
+    }
+
+    /* Tùy chỉnh cột thông tin sản phẩm (bên phải) */
+    .product-info {
+        display: flex;
+        align-items: stretch; /* Đảm bảo nội dung bên trong kéo dài toàn bộ chiều cao */
+        height: 400px; /* Đồng bộ chiều cao với cột ảnh */
+        padding: 0; /* Loại bỏ padding thừa */
+    }
+
+    .info-card {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        width: 100%;
+        height: 100%; /* Đảm bảo info-card chiếm toàn bộ chiều cao của .product-info */
+        padding: 20px; /* Thêm padding để nội dung không sát viền */
+        display: flex;
+        flex-direction: column; /* Sắp xếp nội dung theo chiều dọc */
+        overflow-y: auto; /* Cho phép cuộn nếu nội dung vượt quá */
+    }
+
+        .info-card h3 {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            font-size: 1.5rem;
+            color: #2d3436;
+            margin-bottom: 15px; /* Khoảng cách dưới tiêu đề */
+        }
+
+    .info-item {
+        font-family: 'Roboto', sans-serif;
+        font-size: 1rem;
+        color: #333;
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px; /* Khoảng cách giữa các mục */
+    }
+
+        .info-item strong {
+            color: #2d3436;
+            display: inline-block;
+            width: 120px;
+            flex-shrink: 0;
+        }
+
+    .description-content {
+        flex: 1;
+    }
+
+        .description-content p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.5;
+        }
+
+    /* Tùy chỉnh nút */
+    .btn-outline-secondary {
+        border-color: #6c757d;
+        color: #6c757d;
+        border-radius: 8px;
+        padding: 10px 25px;
+        font-family: 'Roboto', sans-serif;
+        font-weight: 500;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+</style>
+
+@section Scripts {
+    <script>
+        // Hàm định dạng số với dấu phẩy
+        function formatNumber(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Định dạng giá trị Price trong bảng
+        document.addEventListener('DOMContentLoaded', function () {
+            const priceCells = document.querySelectorAll('.price-cell');
+            priceCells.forEach(cell => {
+                let value = parseFloat(cell.getAttribute('data-price'));
+                if (!isNaN(value)) {
+                    cell.textContent = formatNumber(value) + ' đ';
+                }
+            });
+        });
+
+        // Khởi tạo carousel và kiểm tra số lượng ảnh
+        document.addEventListener('DOMContentLoaded', function () {
+            const carouselItems = document.querySelectorAll('.carousel-item');
+            if (carouselItems.length <= 1) {
+                const carousel = document.querySelector('.carousel');
+                carousel.setAttribute('data-bs-interval', '3000');
+                document.querySelectorAll('.carousel-control-prev, .carousel-control-next').forEach(btn => btn.style.display = 'none');
+            } else {
+                const carousel = new bootstrap.Carousel(document.getElementById('productCarousel'), {
+                    interval: 3000
+                });
+            }
+        });
+    </script>
+}

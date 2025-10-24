@@ -1,0 +1,60 @@
+﻿@model Bloomie.Models.ViewModels.InventoryReportViewModel
+
+@{
+    ViewData["Title"] = "Quản lý tồn kho";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+<h2>Báo cáo kho nâng cao</h2>
+
+<div class="card mb-4">
+    <div class="card-header">Tổng số lượng tồn kho theo danh mục</div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Danh mục</th>
+                    <th>Tổng số lượng</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var summary in Model.CategorySummaries)
+                {
+                    <tr>
+                        <td>@summary.CategoryName</td>
+                        <td>@summary.TotalQuantity</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">Số lượng hoa hỏng</div>
+    <div class="card-body">
+        <p>Tổng số lượng hoa hỏng: <strong>@Model.TotalDamagedQuantity</strong></p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">Sản phẩm bán chạy nhất</div>
+    <div class="card-body">
+        @if (Model.TopSellingProduct != null)
+        {
+            <p>Sản phẩm: <strong>@Model.TopSellingProduct.ProductName</strong> - Đã bán: <strong>@Model.TopSellingProduct.QuantitySold</strong></p>
+        }
+        else
+        {
+            <p>Chưa có sản phẩm nào được bán.</p>
+        }
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">Tổng giá trị tồn kho</div>
+    <div class="card-body">
+        <p>Tổng giá trị: <strong>@Model.TotalInventoryValue.ToString("C")</strong></p>
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-primary">Quay lại</a>

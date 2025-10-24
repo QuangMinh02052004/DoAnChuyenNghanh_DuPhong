@@ -1,0 +1,210 @@
+﻿@model Bloomie.Models.Entities.Order
+@using Bloomie.Models.Entities
+
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+    Layout = "~/Areas/Staff/Views/Shared/_StaffLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <!-- Tiêu đề chính -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-dark">
+                    <i class="fas fa-file-invoice text-primary me-2"></i> Chi tiết đơn hàng #@Model.Id
+                </h2>
+                <span class="badge bg-primary text-white p-2">
+                    <i class="fas fa-calendar me-2"></i> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                </span>
+            </div>
+
+            <!-- Thông tin đơn hàng -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Thông tin đơn hàng</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Mã đơn hàng:</strong> @Model.Id</p>
+                    <p><strong>Khách hàng:</strong> @Model.User?.FullName</p>
+                    <p><strong>Email:</strong> @Model.User?.Email</p>
+                    <p><strong>Ngày đặt:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p><strong>Địa chỉ giao hàng:</strong> @Model.ShippingAddress</p>
+                    <p><strong>Tổng tiền:</strong> @Model.TotalPrice.ToString("#,##0") VNĐ</p>
+                    <p><strong>Trạng thái:</strong> @OrderStatusHelper.GetStatusDescription(Model.OrderStatus)</p>
+                </div>
+            </div>
+
+            <!-- Sản phẩm trong đơn hàng -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Sản phẩm trong đơn hàng</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-hover">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th>Tên sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Giá</th>
+                                <th>Tổng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detail in Model.OrderDetails)
+                            {
+                                <tr>
+                                    <td>@detail.Product?.Name</td>
+                                    <td>@detail.Quantity</td>
+                                    <td>@detail.Price.ToString("#,##0") VNĐ</td>
+                                    <td>@((detail.Quantity * detail.Price).ToString("#,##0")) VNĐ</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Lịch sử trạng thái -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Lịch sử trạng thái</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-hover">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th>Thời gian</th>
+                                <th>Trạng thái</th>
+                                <th>Người thay đổi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var history in Model.StatusHistory.OrderBy(h => h.ChangeDate))
+                            {
+                                <tr>
+                                    <td>@history.ChangeDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@OrderStatusHelper.GetStatusDescription(history.Status)</td>
+                                    <td>@history.ChangedBy</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Nút Quay lại -->
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #4b5563; /* Xám đậm */
+        --secondary-color: #9ca3af; /* Xám nhạt */
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+    }
+
+    h2, h4 {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h4 {
+        font-size: 1.25rem;
+    }
+
+    /* Ensure header text in card-header is white */
+    .card-header h4 {
+        color: var(--text-light) !important;
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-header {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        padding: 10px 15px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+        .card-body p {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+            .card-body p strong {
+                color: var(--primary-color);
+                margin-right: 5px;
+            }
+
+    .table {
+        background-color: #ffffff;
+        border-radius: 8px;
+        table-layout: fixed;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+        .table th, .table td {
+            border-color: #e5e7eb;
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    .btn-secondary {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+        transition: all 0.2s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #6b7280;
+            border-color: #6b7280;
+            color: var(--text-light);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+</style>

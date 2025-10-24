@@ -1,0 +1,772 @@
+﻿@model Bloomie.ViewModels.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Thông tin đơn hàng";
+}
+
+<div class="container mt-5 mb-5">
+    <h2 class="text-center mb-5 fw-bold" style="color: #D0021B;">
+        <i class="bi bi-truck me-2"></i> Thông tin đơn hàng
+    </h2>
+
+    @if (!string.IsNullOrEmpty(TempData["ErrorMessage"] as string))
+    {
+        <div class="alert alert-danger text-center shadow-sm rounded" role="alert">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="row">
+        <!-- Cột bên trái: Thông tin người gửi, người nhận, địa chỉ -->
+        <div class="col-lg-8 col-md-7 mb-4">
+            <form asp-action="Checkout" method="post" id="checkoutForm" class="needs-validation" novalidate>
+                <div class="card shadow-lg rounded p-4">
+                    <h4 class="mb-4 fw-bold" style="color: #333;">Thông tin người gửi</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="SenderName" class="form-label" style="color: #555;">Tên người gửi <span class="text-danger">*</span></label>
+                            <input asp-for="SenderName" class="form-control shadow-sm" required maxlength="100" />
+                            <span asp-validation-for="SenderName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="SenderEmail" class="form-label" style="color: #555;">Email <span class="text-danger">*</span></label>
+                            <input asp-for="SenderEmail" type="email" class="form-control shadow-sm" required />
+                            <span asp-validation-for="SenderEmail" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="SenderPhoneNumber" class="form-label" style="color: #555;">Số điện thoại <span class="text-danger">*</span></label>
+                            <input asp-for="SenderPhoneNumber" class="form-control shadow-sm" required pattern="[0-9]{10,11}" maxlength="11" />
+                            <span asp-validation-for="SenderPhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input type="checkbox" class="form-check-input" asp-for="IsSenderReceiverSame" id="sameAsSender" />
+                        <label class="form-check-label" for="sameAsSender" style="color: #555;">Bạn là người nhận</label>
+                    </div>
+
+                    <div id="receiverFields" class="row" style="display: none;">
+                        <h4 class="mb-4 fw-bold" style="color: #333;">Thông tin người nhận</h4>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="ReceiverName" class="form-label" style="color: #555;">Tên người nhận</label>
+                            <input asp-for="ReceiverName" class="form-control shadow-sm" maxlength="100" />
+                            <span asp-validation-for="ReceiverName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="ReceiverEmail" class="form-label" style="color: #555;">Email</label>
+                            <input asp-for="ReceiverEmail" type="email" class="form-control shadow-sm" />
+                            <span asp-validation-for="ReceiverEmail" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label asp-for="ReceiverPhoneNumber" class="form-label" style="color: #555;">Số điện thoại</label>
+                            <input asp-for="ReceiverPhoneNumber" class="form-control shadow-sm" pattern="[0-9]{10,11}" maxlength="11" />
+                            <span asp-validation-for="ReceiverPhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <label for="province" class="form-label" style="color: #555;">Tỉnh/Thành <span class="text-danger">*</span></label>
+                            <select id="province" name="province" class="form-select shadow-sm" required>
+                                <option value="">Chọn Tỉnh/Thành</option>
+                            </select>
+                            <span class="text-danger" id="province-error"></span>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <label for="district" class="form-label" style="color: #555;">Quận/Huyện <span class="text-danger">*</span></label>
+                            <select id="district" class="form-select shadow-sm" onchange="loadWards()" disabled required>
+                                <option value="">Chọn Quận/Huyện</option>
+                            </select>
+                            <span class="text-danger" id="district-error"></span>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <label for="ward" class="form-label" style="color: #555;">Xã/Phường <span class="text-danger">*</span></label>
+                            <select id="ward" class="form-select shadow-sm" disabled required>
+                                <option value="">Chọn Xã/Phường</option>
+                            </select>
+                            <span class="text-danger" id="ward-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ShippingAddress" class="form-label" style="color: #555;">Địa chỉ giao hàng <span class="text-danger">*</span></label>
+                        <textarea asp-for="ShippingAddress" class="form-control shadow-sm" required maxlength="500" placeholder="Nhập địa chỉ cụ thể (số nhà, tên đường...)"></textarea>
+                        <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ShippingMethod" class="form-label" style="color: #555;">Phương thức giao hàng <span class="text-danger">*</span></label>
+                        <select asp-for="ShippingMethod" class="form-select shadow-sm" required>
+                            <option value="">Chọn phương thức giao hàng</option>
+                            <option value="Express">Giao hàng nhanh</option>
+                        </select>
+                        <span asp-validation-for="ShippingMethod" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label" style="color: #555;">Phương thức thanh toán <span class="text-danger">*</span></label>
+                        <div class="payment-methods">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" asp-for="PaymentMethod" id="paymentCod" value="CashOnDelivery" required>
+                                <label class="form-check-label payment-label" for="paymentCod">
+                                    <img src="~/images/cod-logo.jpg" alt="COD" class="payment-icon">
+                                    <span class="payment-text">Thanh toán khi nhận hàng (COD)</span>
+                                    <span class="info-icon" title="Thanh toán bằng tiền mặt khi nhận hàng"><i class="bi bi-info-circle"></i></span>
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" asp-for="PaymentMethod" id="paymentVnpay" value="Vnpay" required>
+                                <label class="form-check-label payment-label" for="paymentVnpay">
+                                    <img src="https://vnpay.vn/assets/images/logo-icon/logo-primary.svg" alt="VnPay" class="payment-icon">
+                                    <div class="payment-info">
+                                        <span class="payment-text">Thanh toán qua VnPay</span>
+                                        <div class="discount-text">
+                                            <span class="discount-amount">Giảm 10,000đ cho đơn trên 800,000đ với VnPay</span>
+                                            <a href="#" class="connect-link">Liên kết <i class="bi bi-chevron-right"></i></a>
+                                        </div>
+                                        <small class="promo-text">Liên kết tài khoản VnPay của bạn với TikTok Shop và thử tính năng thanh toán không cần mật khẩu</small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" asp-for="PaymentMethod" id="paymentMomo" value="Momo" required>
+                                <label class="form-check-label payment-label" for="paymentMomo">
+                                    <img src="~/images/logo-momo.jpg" alt="Momo" class="payment-icon">
+                                    <span class="payment-text">Thanh toán qua Momo</span>
+                                </label>
+                            </div>
+                        </div>
+                        <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Notes" class="form-label" style="color: #555;">Ghi chú</label>
+                        <textarea asp-for="Notes" class="form-control shadow-sm" maxlength="500" placeholder="Ghi chú cho đơn hàng (nếu có)"></textarea>
+                        <span asp-validation-for="Notes" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-custom w-100 py-3 fw-bold shadow">
+                        <i class="bi bi-check-circle me-2"></i> Xác nhận đặt hàng
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Cột bên phải: Tóm tắt đơn hàng -->
+        <div class="col-lg-4 col-md-5 mb-4">
+            <div class="card shadow-lg rounded p-4 order-summary">
+                <h4 class="mb-4 fw-bold" style="color: #333;">Chi tiết đơn hàng</h4>
+                @if (Model?.CartItems != null && Model.CartItems.Any())
+                {
+                    <ul class="list-group mb-4 shadow-sm">
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <li class="list-group-item py-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <img src="@item.ImageUrl" alt="@item.Name" style="width: 80px; height: 80px; border-radius: 10px; margin-right: 15px; object-fit: cover;" />
+                                    <div>
+                                        <div class="text-muted small">
+                                            @item.Name
+                                        </div>
+                                        <div class="text-muted small">
+                                            Số lượng: @item.Quantity
+                                        </div>
+                                        <div class="text-muted small">
+                                            Ngày giao: @(item.DeliveryDate?.ToString("dd/MM/yyyy") ?? "Chưa chọn")
+                                        </div>
+                                        <div class="text-muted small">
+                                            Giờ giao: @item.DeliveryTime
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="fw-bold" style="color: #D0021B;">@((item.Price * item.Quantity).ToString("#,##0")) đ</span>
+                                </div>
+                            </li>
+                        }
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 fw-bold" style="background-color: #F9F9F9;">
+                            <span><i class="bi bi-cart3 me-2" style="color: #4CAF50;"></i> Tổng tiền sản phẩm</span>
+                            <span id="product-total" class="text-danger">@Model.TotalPrice.ToString("#,##0") đ</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 fw-bold" style="background-color: #F9F9F9;">
+                            <span><i class="bi bi-truck me-2" style="color: #4CAF50;"></i> Phí vận chuyển</span>
+                            <span id="shipping-cost" class="text-danger">@Model.ShippingCost.ToString("#,##0") đ</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 fw-bold" style="background-color: #F5F5F5;">
+                            <span><i class="bi bi-wallet2 me-2" style="color: #4CAF50;"></i> Tổng thanh toán</span>
+                            <span id="total-payment" class="text-danger" style="font-size: 1.2rem;">@((Model.TotalPrice + Model.ShippingCost).ToString("#,##0")) đ</span>
+                        </li>
+                    </ul>
+                    <p class="text-muted small mb-4">Phí vận chuyển sẽ tự động cập nhật khi bạn chọn tỉnh, quận, và phường.</p>
+                    <input type="hidden" id="productTotalInput" value="@Model.TotalPrice" />
+                    <input type="hidden" asp-for="ShippingCost" id="shippingCostInput" value="@Model.ShippingCost" />
+                }
+                else
+                {
+                    <p class="text-muted text-center py-3">Giỏ hàng của bạn trống. 🛒</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-primary {
+        color: #D0021B !important;
+    }
+
+    .card {
+        border: none;
+        border-radius: 15px;
+        background-color: #FFFFFF;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid #E8ECEF;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+
+        .list-group-item:hover {
+            background-color: #F5F7FA;
+            transform: translateX(5px);
+        }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        font-size: 1rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #CED4DA;
+        border-radius: 10px;
+        padding: 12px 15px;
+        font-size: 1rem;
+        background-color: #FAFAFA;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #D0021B;
+            box-shadow: 0 0 8px rgba(208, 2, 27, 0.2);
+            background-color: #FFFFFF;
+            outline: none;
+        }
+
+    .btn-primary-custom {
+        background-color: #D0021B;
+        border-color: #D0021B;
+        color: #FFFFFF;
+        font-size: 1.1rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-primary-custom:hover {
+            background-color: #F5A623;
+            border-color: #F5A623;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+    .alert-danger {
+        border-radius: 12px;
+        font-size: 1rem;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+        background-color: #FFF5F5;
+        color: #721C24;
+        border: 1px solid #F8D7DA;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-check-input:checked {
+        background-color: #4CAF50;
+        border-color: #4CAF50;
+    }
+
+    .form-check-label {
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+        color: #6C757D !important;
+    }
+
+    .payment-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .payment-label {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #CED4DA;
+        border-radius: 10px;
+        background-color: #FAFAFA;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+        .payment-label:hover {
+            background-color: #F5F7FA;
+            border-color: #D0021B;
+        }
+
+    .payment-icon {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+        object-fit: contain;
+    }
+
+    .payment-text {
+        margin-right: 10px;
+        font-weight: 500;
+    }
+
+    .info-icon {
+        color: #6C757D;
+        font-size: 1rem;
+        margin-left: auto;
+    }
+
+    .payment-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .discount-text {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .discount-amount {
+        color: #D0021B;
+        font-weight: 600;
+    }
+
+    .connect-link {
+        color: #D0021B;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+        .connect-link:hover {
+            text-decoration: underline;
+        }
+
+    .promo-text {
+        color: #6C757D;
+        font-size: 0.85rem;
+    }
+
+    .form-check-input {
+        margin-right: 10px;
+    }
+</style>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function updateShippingAddress() {
+            const tinh = $("#province option:selected").data("name") || "";
+            const quan = $("#district option:selected").data("name") || "";
+            const phuong = $("#ward option:selected").data("name") || "";
+            const specificAddress = $("#ShippingAddress").val().trim();
+
+            // Ghép địa chỉ: Địa chỉ cụ thể + Phường/Xã + Quận/Huyện + Tỉnh/Thành
+            let fullAddress = specificAddress;
+            if (phuong) fullAddress = fullAddress ? `${fullAddress}, ${phuong}` : phuong;
+            if (quan) fullAddress = fullAddress ? `${fullAddress}, ${quan}` : quan;
+            if (tinh) fullAddress = fullAddress ? `${fullAddress}, ${tinh}` : tinh;
+
+            $("#ShippingAddress").val(fullAddress);
+            console.log("Địa chỉ đầy đủ:", fullAddress);
+        }
+
+        $(document).ready(function () {
+            const provinceSelect = $("#province");
+            if (provinceSelect.length === 0) {
+                console.error("Không tìm thấy thẻ <select> với id='province'. Vui lòng kiểm tra HTML.");
+                return;
+            }
+
+            provinceSelect.css({
+                display: "block",
+                width: "100%",
+                padding: "8px",
+                marginBottom: "10px",
+                visibility: "visible",
+                opacity: "1",
+                height: "auto"
+            });
+            provinceSelect.prop("disabled", false);
+
+            console.log("Trạng thái ban đầu của #province:", provinceSelect.html());
+            console.log("Thuộc tính disabled của #province:", provinceSelect.prop("disabled"));
+
+            provinceSelect.on("change", function () {
+                console.log("Dropdown tỉnh/thành đã thay đổi, provinceId:", $(this).val());
+                loadDistricts();
+            });
+
+            $("#district").on("change", function () {
+                console.log("Dropdown quận/huyện đã thay đổi, districtId:", $(this).val());
+                loadWards();
+            });
+
+            $("#ward").on("change", function () {
+                console.log("Dropdown xã/phường đã thay đổi, wardCode:", $(this).val());
+                calculateShipping();
+            });
+
+            loadProvinces();
+
+            $("#sameAsSender").on("change", function () {
+                const receiverFields = $("#receiverFields");
+                const receiverName = $("#ReceiverName");
+                const receiverPhoneNumber = $("#ReceiverPhoneNumber");
+                const receiverEmail = $("#ReceiverEmail");
+                const senderName = $("#SenderName");
+                const senderPhoneNumber = $("#SenderPhoneNumber");
+                const senderEmail = $("#SenderEmail");
+
+                if ($(this).is(":checked")) {
+                    receiverFields.hide();
+                    receiverName.val(senderName.val());
+                    receiverPhoneNumber.val(senderPhoneNumber.val());
+                    receiverEmail.val(senderEmail.val());
+                } else {
+                    receiverFields.show();
+                    receiverName.val("");
+                    receiverPhoneNumber.val("");
+                    receiverEmail.val("");
+                }
+            });
+            $("#sameAsSender").trigger("change");
+
+            // Xử lý trước khi gửi form: ghép địa chỉ đầy đủ
+            $(".needs-validation").on("submit", function (event) {
+                if (!this.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                $(this).addClass("was-validated");
+
+                // Ghép địa chỉ đầy đủ trước khi gửi
+                const tinh = $("#province option:selected").data("name") || "";
+                const quan = $("#district option:selected").data("name") || "";
+                const phuong = $("#ward option:selected").data("name") || "";
+                const specificAddress = $("#ShippingAddress").val().trim();
+
+                let fullAddress = specificAddress;
+                if (phuong) fullAddress = fullAddress ? `${fullAddress}, ${phuong}` : phuong;
+                if (quan) fullAddress = fullAddress ? `${fullAddress}, ${quan}` : quan;
+                if (tinh) fullAddress = fullAddress ? `${fullAddress}, ${tinh}` : tinh;
+
+                console.log("Địa chỉ đầy đủ trước khi gửi:", fullAddress);
+
+                // Gán địa chỉ đầy đủ vào một trường ẩn để gửi lên server
+                if ($("#FullShippingAddress").length === 0) {
+                    $(this).append('<input type="hidden" id="FullShippingAddress" name="ShippingAddress" />');
+                }
+                $("#FullShippingAddress").val(fullAddress);
+
+                // Đảm bảo textarea gốc không gửi giá trị (chỉ gửi FullShippingAddress)
+                $("#ShippingAddress").attr("name", "OriginalShippingAddress");
+            });
+
+            // Khởi tạo tổng tiền khi tải lại trang
+            const initialShippingCost = parseFloat($("#shippingCostInput").val()) || 0;
+            updateTotalPrice(initialShippingCost);
+        });
+
+        function loadProvinces() {
+            const provinceSelect = $("#province");
+            provinceSelect.html('<option value="">Chọn Tỉnh/Thành</option>');
+
+            fetch("/Order/GetProvinces", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Dữ liệu tỉnh/thành từ API (raw):", data);
+
+                    let provinces = [];
+                    if (data && Array.isArray(data)) {
+                        provinces = data;
+                    } else {
+                        console.error("Dữ liệu tỉnh/thành không hợp lệ:", data);
+                        alert("Dữ liệu từ server không hợp lệ. Vui lòng thử lại hoặc kiểm tra log.");
+                        return;
+                    }
+
+                    if (provinces.length === 0) {
+                        console.warn("Danh sách tỉnh/thành rỗng:", data);
+                        alert("Không có dữ liệu tỉnh/thành để hiển thị.");
+                        return;
+                    }
+
+                    let addedCount = 0;
+                    provinces.forEach((province, index) => {
+                        try {
+                            if (province && typeof province === 'object' && province.provinceID !== undefined && province.provinceName !== undefined) {
+                                provinceSelect.append(
+                                    $("<option>", {
+                                        value: province.provinceID,
+                                        "data-name": province.provinceName,
+                                        text: province.provinceName
+                                    })
+                                );
+                                addedCount++;
+                                console.log(`Đã thêm option: ${province.provinceName} (ID: ${province.provinceID})`);
+                            } else {
+                                console.warn(`Dữ liệu province không hợp lệ tại index ${index}:`, province);
+                            }
+                        } catch (e) {
+                            console.error(`Lỗi khi xử lý province tại index ${index}:`, e, province);
+                        }
+                    });
+
+                    const optionCount = provinceSelect.find("option").length;
+                    console.log("Số lượng option đã thêm:", addedCount, "Tổng option trong dropdown:", optionCount);
+                    if (optionCount <= 1) {
+                        console.warn("Dropdown không được điền dữ liệu đầy đủ. Kiểm tra HTML của #province:", provinceSelect.html());
+                    } else {
+                        console.log("Dropdown đã được điền dữ liệu thành công:", provinceSelect.html());
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi khi tải tỉnh/thành:", error);
+                    alert("Không thể tải danh sách tỉnh/thành. Vui lòng thử lại. Chi tiết lỗi: " + error.message);
+                });
+        }
+
+        function loadDistricts() {
+            const provinceId = $("#province").val();
+            const districtSelect = $("#district");
+            const wardSelect = $("#ward");
+            districtSelect.prop("disabled", true);
+            districtSelect.html('<option value="">Chọn Quận/Huyện</option>');
+            wardSelect.prop("disabled", true);
+            wardSelect.html('<option value="">Chọn Xã/Phường</option>');
+            $("#shipping-cost").text("0 đ");
+            updateTotalPrice(0);
+
+            if (provinceId) {
+                console.log("Gửi yêu cầu tải quận/huyện với provinceId:", provinceId);
+                fetch(`/Order/GetDistricts?provinceId=${provinceId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Dữ liệu quận/huyện từ API:", data);
+                        districtSelect.html('<option value="">Chọn Quận/Huyện</option>');
+
+                        let districts = [];
+                        if (data && Array.isArray(data)) {
+                            districts = data;
+                        } else if (data && data.Data && Array.isArray(data.Data)) {
+                            districts = data.Data;
+                        } else {
+                            console.error("Dữ liệu quận/huyện không hợp lệ:", data);
+                            alert("Không tải được danh sách quận/huyện. Vui lòng thử lại.");
+                            return;
+                        }
+
+                        districts.forEach(district => {
+                            let districtId = district.districtID || district.DistrictID;
+                            let districtName = district.districtName || district.DistrictName;
+                            if (districtId && districtName) {
+                                districtSelect.append(
+                                    $("<option>", {
+                                        value: districtId,
+                                        "data-name": districtName,
+                                        text: districtName
+                                    })
+                                );
+                            }
+                        });
+                        districtSelect.prop("disabled", false);
+                        districtSelect.css({
+                            display: "block",
+                            width: "100%",
+                            padding: "8px",
+                            marginBottom: "10px"
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Lỗi khi tải quận/huyện:", error);
+                        alert("Không thể tải danh sách quận/huyện. Vui lòng thử lại. Chi tiết: " + error.message);
+                    });
+            } else {
+                console.log("Không có provinceId hợp lệ, không gọi API.");
+            }
+        }
+
+        function loadWards() {
+            const districtId = $("#district").val();
+            const wardSelect = $("#ward");
+            wardSelect.prop("disabled", true);
+            wardSelect.html('<option value="">Chọn Xã/Phường</option>');
+            $("#shipping-cost").text("0 đ");
+            updateTotalPrice(0);
+
+            if (districtId) {
+                fetch(`/Order/GetWards?districtId=${districtId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Dữ liệu xã/phường từ API:", data);
+                        wardSelect.html('<option value="">Chọn Xã/Phường</option>');
+
+                        let wards = [];
+                        if (data && Array.isArray(data)) {
+                            wards = data;
+                        } else if (data && data.Data && Array.isArray(data.Data)) {
+                            wards = data.Data;
+                        } else {
+                            console.error("Dữ liệu xã/phường không hợp lệ:", data);
+                            alert("Không tải được danh sách xã/phường. Vui lòng thử lại.");
+                            return;
+                        }
+
+                        wards.forEach(ward => {
+                            let wardCode = ward.wardCode || ward.WardCode;
+                            let wardName = ward.wardName || ward.WardName;
+                            if (wardCode && wardName) {
+                                wardSelect.append(
+                                    $("<option>", {
+                                        value: wardCode,
+                                        "data-name": wardName,
+                                        text: wardName
+                                    })
+                                );
+                            }
+                        });
+                        wardSelect.prop("disabled", false);
+                        wardSelect.css({
+                            display: "block",
+                            width: "100%",
+                            padding: "8px",
+                            marginBottom: "10px"
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Lỗi khi tải xã/phường:", error);
+                        alert("Không thể tải danh sách xã/phường. Vui lòng thử lại. Chi tiết: " + error.message);
+                    });
+            }
+        }
+
+        function calculateShipping() {
+            const provinceId = $("#province").val();
+            const districtId = $("#district").val();
+            const wardCode = $("#ward").val();
+            const tinh = $("#province option:selected").data("name");
+            const quan = $("#district option:selected").data("name");
+            const phuong = $("#ward option:selected").data("name");
+
+            if (provinceId && districtId && wardCode && provinceId !== "Chọn Tỉnh/Thành" && districtId !== "Chọn Quận/Huyện" && wardCode !== "Chọn Xã/Phường") {
+                const shippingData = {
+                    City: tinh,
+                    District: quan,
+                    Ward: phuong,
+                    Price: 0
+                };
+
+                const formData = new FormData();
+                formData.append('shippingModel.City', shippingData.City);
+                formData.append('shippingModel.District', shippingData.District);
+                formData.append('shippingModel.Ward', shippingData.Ward);
+                formData.append('shippingModel.Price', shippingData.Price);
+                formData.append('tinh', tinh);
+                formData.append('quan', quan);
+                formData.append('phuong', phuong);
+
+                console.log("Gửi yêu cầu tính phí vận chuyển với dữ liệu:", { shippingModel: shippingData, tinh, quan, phuong });
+
+                fetch("/Order/GetShipping", {
+                    method: "POST",
+                    body: formData
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Lỗi HTTP! Mã trạng thái: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Kết quả tính phí vận chuyển:", data);
+                        if (data && data.shippingPrice != null && !isNaN(data.shippingPrice)) {
+                            const shippingCost = data.shippingPrice;
+                            $("#shipping-cost").text(shippingCost.toLocaleString('vi-VN') + ' đ');
+                            $("#shippingCostInput").val(data.shippingPrice);
+                            updateTotalPrice(shippingCost);
+                        } else if (data && data.error) {
+                            console.error("Lỗi từ server:", data.error);
+                            alert("Lỗi khi tính phí vận chuyển: " + data.error);
+                            updateTotalPrice(0);
+                        } else {
+                            console.error("Dữ liệu không hợp lệ:", data);
+                            alert("Không thể tính phí vận chuyển. Dữ liệu trả về không hợp lệ.");
+                            $("#shipping-cost").text("0 đ");
+                            updateTotalPrice(0);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Lỗi khi tính phí vận chuyển:", error);
+                        alert("Không thể tính phí vận chuyển. Vui lòng thử lại. Chi tiết: " + error.message);
+                        $("#shipping-cost").text("0 đ");
+                        updateTotalPrice(0);
+                    });
+            } else {
+                console.log("Thông tin địa chỉ chưa đầy đủ:", { provinceId, districtId, wardCode });
+                updateTotalPrice(0);
+            }
+        }
+
+        function updateTotalPrice(shippingPrice) {
+            const productTotal = parseFloat($("#productTotalInput").val()) || 0;
+            console.log("Tổng tiền sản phẩm:", productTotal, "Phí vận chuyển:", shippingPrice);
+
+            const totalPrice = productTotal + (shippingPrice || 0);
+            console.log("Tổng thanh toán tính toán:", totalPrice);
+
+            $("#total-payment").text(totalPrice.toLocaleString('vi-VN') + ' đ');
+            $("#shippingCostInput").val(shippingPrice || 0);
+        }
+    </script>
+}

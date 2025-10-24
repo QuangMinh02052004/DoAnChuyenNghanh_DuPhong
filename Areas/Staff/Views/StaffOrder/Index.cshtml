@@ -1,0 +1,311 @@
+﻿@model IEnumerable<Bloomie.Models.Entities.Order>
+@using Bloomie.Models.Entities
+
+@{
+    Layout = "~/Areas/Staff/Views/Shared/_StaffLayout.cshtml";
+    ViewData["Title"] = "Quản lý đơn hàng";
+    var currentPage = ViewData["CurrentPage"] as int? ?? 1;
+    var totalPages = ViewData["TotalPages"] as int? ?? 1;
+    var searchString = ViewData["SearchString"] as string ?? "";
+    var statusFilter = ViewData["StatusFilter"] as OrderStatus?;
+}
+
+<div class="container-fluid">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <!-- Tiêu đề chính -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-dark">
+                    <i class="fas fa-shopping-cart text-primary me-2"></i> Quản lý đơn hàng
+                </h2>
+                <span class="badge bg-primary text-white p-2">
+                    <i class="fas fa-calendar me-2"></i> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                </span>
+            </div>
+
+            @if (TempData["success"] != null)
+            {
+                <div class="alert alert-success mb-4">@TempData["success"]</div>
+            }
+            @if (TempData["error"] != null)
+            {
+                <div class="alert alert-danger mb-4">@TempData["error"]</div>
+            }
+
+            <!-- Form tìm kiếm -->
+            <form method="get" asp-action="Index">
+                <div class="input-group mb-4">
+                    <input type="text" name="searchString" value="@searchString" class="form-control" placeholder="Tìm kiếm đơn hàng..." />
+                    <select name="statusFilter" class="form-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="Pending" selected="@(statusFilter == OrderStatus.Pending ? "selected" : null)">Chờ xử lý</option>
+                        <option value="Processing" selected="@(statusFilter == OrderStatus.Processing ? "selected" : null)">Đang xử lý</option>
+                        <option value="Shipped" selected="@(statusFilter == OrderStatus.Shipped ? "selected" : null)">Đã giao cho đơn vị vận chuyển</option>
+                        <option value="Delivered" selected="@(statusFilter == OrderStatus.Delivered ? "selected" : null)">Đã giao</option>
+                        <option value="Cancelled" selected="@(statusFilter == OrderStatus.Cancelled ? "selected" : null)">Đã hủy</option>
+                    </select>
+                    <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+                </div>
+            </form>
+
+            <!-- Bảng đơn hàng -->
+            <table class="table table-bordered table-hover">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Ngày đặt</th>
+                        <th>Địa chỉ giao</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td>@order.Id</td>
+                            <td>@order.User?.FullName</td>
+                            <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@order.ShippingAddress</td>
+                            <td>@OrderStatusHelper.GetStatusDescription(order.OrderStatus)</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-info btn-sm">Chi tiết</a>
+                                @if (order.OrderStatus == OrderStatus.Pending)
+                                {
+                                    <form asp-action="Approve" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="currentPage" value="@currentPage" />
+                                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Bạn chắc chắn muốn duyệt đơn này?');">Duyệt</button>
+                                    </form>
+                                    <form asp-action="Cancel" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="currentPage" value="@currentPage" />
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn chắc chắn muốn hủy đơn này?');">Hủy</button>
+                                    </form>
+                                }
+                                @if (order.OrderStatus == OrderStatus.Processing)
+                                {
+                                    <form asp-action="UpdateStatus" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="newStatus" value="@((int)OrderStatus.Shipped)" />
+                                        <input type="hidden" name="currentPage" value="@currentPage" />
+                                        <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('Bạn chắc chắn muốn cập nhật trạng thái thành Đã giao?');">Đã giao</button>
+                                    </form>
+                                    <form asp-action="Cancel" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="currentPage" value="@currentPage" />
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn chắc chắn muốn hủy đơn này?');">Hủy</button>
+                                    </form>
+                                }
+                                @if (order.OrderStatus == OrderStatus.Shipped)
+                                {
+                                    <form asp-action="UpdateStatus" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <input type="hidden" name="newStatus" value="@((int)OrderStatus.Delivered)" />
+                                        <input type="hidden" name="currentPage" value="@currentPage" />
+                                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Bạn chắc chắn muốn cập nhật trạng thái thành Giao thành công?');">Giao thành công</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- Phân trang -->
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@(currentPage - 1)" asp-route-searchString="@searchString" asp-route-statusFilter="@statusFilter">Trước</a>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@searchString" asp-route-statusFilter="@statusFilter">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-pageNumber="@(currentPage + 1)" asp-route-searchString="@searchString" asp-route-statusFilter="@statusFilter">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #4b5563; /* Xám đậm */
+        --secondary-color: #9ca3af; /* Xám nhạt */
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+    }
+
+    h2 {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 1.75rem;
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #374151;
+            border-color: #374151;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-info {
+        background-color: #0dcaf0;
+        border-color: #0dcaf0;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-info:hover {
+            background-color: #0bb2d4;
+            border-color: #0bb2d4;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #c82333;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .form-control, .form-select {
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        padding: 8px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(75, 85, 99, 0.1);
+            outline: none;
+        }
+
+    .table {
+        background-color: #ffffff;
+        border-radius: 8px;
+        table-layout: fixed;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+        .table th, .table td {
+            border-color: #e5e7eb;
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+        border-radius: 8px;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+        border-radius: 8px;
+    }
+
+    .pagination .page-link {
+        color: var(--primary-color);
+        border-color: #e5e7eb;
+        border-radius: 6px;
+        padding: 8px 12px;
+        transition: all 0.2s ease;
+    }
+
+        .pagination .page-link:hover {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: var(--text-light);
+    }
+</style>

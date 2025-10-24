@@ -1,0 +1,1071 @@
+﻿@using System.Globalization
+@model Bloomie.Models.ViewModels.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Bảng Điều Khiển Admin";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@{
+    // Chuyển đổi categoryId từ query string thành int? một cách an toàn
+    int? selectedCategoryId = null;
+    if (ViewContext.HttpContext.Request.Query["categoryId"].Count > 0)
+    {
+        if (int.TryParse(ViewContext.HttpContext.Request.Query["categoryId"].FirstOrDefault(), out int parsedCategoryId))
+        {
+            selectedCategoryId = parsedCategoryId;
+        }
+    }
+}
+
+<div class="container-fluid">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <!-- Tiêu đề chính -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-dark">
+                    <i class="fas fa-tachometer-alt text-primary me-2"></i> Bảng Điều Khiển Admin
+                </h2>
+                <span class="badge bg-primary text-white p-2">
+                    <i class="fas fa-calendar me-2"></i> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                </span>
+            </div>
+
+            <!-- Thông báo nhanh -->
+            @if (Model.Notifications.Any())
+            {
+                <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+                    <strong>Thông báo:</strong>
+                    <ul class="mb-0">
+                        @foreach (var notification in Model.Notifications)
+                        {
+                            <li>@notification</li>
+                        }
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Thống kê tổng quan -->
+            <div class="row mb-4 g-3">
+                <!-- Sản phẩm -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card p-3 text-center">
+                        <i class="bi bi-box-seam text-primary" style="font-size: 1.5rem;"></i>
+                        <h5 class="card-title mt-2">Sản phẩm</h5>
+                        <h3 class="fw-bold text-primary">@Model.TotalProducts</h3>
+                        <a asp-area="Admin" asp-controller="AdminProduct" asp-action="Index" class="btn btn-sm btn-outline-primary">Quản lý</a>
+                    </div>
+                </div>
+                <!-- Đơn hàng -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card p-3 text-center">
+                        <i class="bi bi-cart text-success" style="font-size: 1.5rem;"></i>
+                        <h5 class="card-title mt-2">Đơn hàng</h5>
+                        <h3 class="fw-bold text-success">@Model.TotalOrders</h3>
+                        <a asp-area="Admin" asp-controller="AdminOrder" asp-action="Index" class="btn btn-sm btn-outline-success">Quản lý</a>
+                    </div>
+                </div>
+                <!-- Người dùng -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card p-3 text-center">
+                        <i class="bi bi-people text-warning" style="font-size: 1.5rem;"></i>
+                        <h5 class="card-title mt-2">Người dùng</h5>
+                        <h3 class="fw-bold text-warning">@Model.TotalUsers</h3>
+                        <a asp-area="Admin" asp-controller="AdminUser" asp-action="Index" class="btn btn-sm btn-outline-warning">Quản lý</a>
+                    </div>
+                </div>
+                <!-- Khuyến mãi -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card p-3 text-center">
+                        <i class="bi bi-tag text-secondary" style="font-size: 1.5rem;"></i>
+                        <h5 class="card-title mt-2">Khuyến mãi</h5>
+                        <h3 class="fw-bold text-secondary">@Model.TotalPromotions</h3>
+                        <a asp-area="Admin" asp-controller="AdminPromotion" asp-action="Index" class="btn btn-sm btn-outline-secondary">Quản lý</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thống kê doanh thu -->
+            <div class="mb-4">
+                <h4 class="fw-bold text-dark mb-3"><i class="fas fa-chart-line me-2"></i> Thống Kê Doanh Thu</h4>
+                <div class="row g-3">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stat-card p-3 text-center">
+                            <h6 class="text-muted mb-2">Tổng Doanh Thu Bán</h6>
+                            <h3 class="fw-bold text-primary">@Model.TotalSalesRevenue.ToString("N0") đ</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stat-card p-3 text-center">
+                            <h6 class="text-muted mb-2">Số Lượng Bán Ra</h6>
+                            <h3 class="fw-bold text-primary">@Model.TotalItemsSold.ToString("N0")</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stat-card p-3 text-center">
+                            <h6 class="text-muted mb-2">Tổng Doanh Thu Nhập</h6>
+                            <h3 class="fw-bold text-success">@Model.TotalImportRevenue.ToString("N0") đ</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="stat-card p-3 text-center">
+                            <h6 class="text-muted mb-2">Số Lượng Nhập</h6>
+                            <h3 class="fw-bold text-success">@Model.TotalItemsImported.ToString("N0")</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thống kê nhanh -->
+            <div class="row mb-4 g-3">
+                <!-- Lượt truy cập -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card p-3 text-center">
+                        <i class="bi bi-eye text-dark" style="font-size: 1.5rem;"></i>
+                        <h5 class="card-title mt-2">Lượt truy cập</h5>
+                        <h3 class="fw-bold text-dark">@Model.TotalAccessCount</h3>
+                    </div>
+                </div>
+                <!-- Trạng thái tồn kho -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card p-3 text-center">
+                        <i class="bi bi-boxes text-danger" style="font-size: 1.5rem;"></i>
+                        <h5 class="card-title mt-2">Tồn kho</h5>
+                        <p class="card-text mb-1">
+                            <span class="text-warning">Sắp hết: @Model.LowStockProductCount</span>
+                        </p>
+                        <p class="card-text mb-1">
+                            <span class="text-danger">Hết hàng: @Model.OutOfStockProductCount</span>
+                        </p>
+                        <a asp-area="Admin" asp-controller="AdminProduct" asp-action="Index" class="btn btn-sm btn-outline-danger">Xem</a>
+                    </div>
+                </div>
+                <!-- Tổng doanh thu hôm nay -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card p-3 text-center">
+                        <i class="bi bi-currency-dollar text-info" style="font-size: 1.5rem;"></i>
+                        <h5 class="card-title mt-2">Doanh thu hôm nay</h5>
+                        <h3 class="fw-bold text-info">@Model.DailyRevenue.ToString("N0") đ</h3>
+                    </div>
+                </div>
+                <!-- Tổng doanh thu tuần -->
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card p-3 text-center">
+                        <i class="bi bi-currency-dollar text-info" style="font-size: 1.5rem;"></i>
+                        <h5 class="card-title mt-2">Doanh thu tuần</h5>
+                        <h3 class="fw-bold text-info">@Model.WeeklyRevenue.ToString("N0") đ</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danh sách sản phẩm sắp hết hàng -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title d-flex justify-content-between align-items-center">
+                        Danh Sách Sản Phẩm Sắp Hết Hàng
+                        <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#lowStockProducts" aria-expanded="false" aria-controls="lowStockProducts">
+                            <i class="bi bi-chevron-down"></i> Xem
+                        </button>
+                    </h5>
+                    <div class="collapse" id="lowStockProducts">
+                        <form asp-action="Index" method="get" class="mb-3">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <input type="text" name="searchQuery" class="form-control" placeholder="Tìm kiếm sản phẩm..." value="@(ViewContext.HttpContext.Request.Query["searchQuery"])">
+                                </div>
+                                <div class="col-md-4">
+                                    <select name="categoryId" class="form-select">
+                                        <option value="">Tất cả danh mục</option>
+                                        @foreach (var category in Model.Categories)
+                                        {
+                                            <option value="@category.Id" selected="@(category.Id == selectedCategoryId ? "selected" : null)">@category.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary">Lọc</button>
+                                    <a asp-action="Index" class="btn btn-secondary">Xóa bộ lọc</a>
+                                </div>
+                            </div>
+                        </form>
+                        @if (Model.LowStockProducts.Any())
+                        {
+                            <table class="table table-bordered table-hover mt-3">
+                                <thead class="bg-primary text-white">
+                                    <tr>
+                                        <th>Tên Sản Phẩm</th>
+                                        <th>Số Lượng</th>
+                                        <th>Danh Mục</th>
+                                        <th>Hành Động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in Model.LowStockProducts)
+                                    {
+                                        <tr>
+                                            <td>@product.Name</td>
+                                            <td class="text-warning">@product.Quantity</td>
+                                            <td>@(product.Category?.Name ?? "N/A")</td>
+                                            <td>
+                                                <a asp-area="Admin" asp-controller="AdminProduct" asp-action="Update" asp-route-id="@product.Id" class="btn btn-sm btn-primary">
+                                                    <i class="bi bi-pencil-square"></i> Cập nhật
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p class="text-muted mt-3">Không có sản phẩm nào sắp hết hàng.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danh sách doanh thu -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Danh Sách Doanh Thu Năm @DateTime.Now.Year</h5>
+                    @if (Model.RevenueSummaries.Any())
+                    {
+                        <table class="table table-bordered table-hover mt-3">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th>Tháng</th>
+                                    <th>Doanh Thu Bán (VND)</th>
+                                    <th>Số Lượng Bán</th>
+                                    <th>Doanh Thu Nhập (VND)</th>
+                                    <th>Số Lượng Nhập</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var summary in Model.RevenueSummaries)
+                                {
+                                    <tr>
+                                        <td>@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(summary.Period)</td>
+                                        <td>@summary.TotalSalesRevenue.ToString("N0")</td>
+                                        <td>@summary.TotalItemsSold.ToString("N0")</td>
+                                        <td>@summary.TotalImportRevenue.ToString("N0")</td>
+                                        <td>@summary.TotalItemsImported.ToString("N0")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted mt-3">Không có dữ liệu doanh thu.</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Biểu đồ -->
+            <div class="row mb-4">
+                <!-- Doanh thu theo tháng -->
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm chart-container">
+                        <div class="card-body">
+                            <h5 class="card-title">Doanh Thu Năm @DateTime.Now.Year (Theo Tháng)</h5>
+                            @if (Model.RevenueSummaries != null && Model.RevenueSummaries.Any())
+                            {
+                                <canvas id="revenueChart"></canvas>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Không có dữ liệu doanh thu cho năm này.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <!-- Doanh thu theo danh mục -->
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm chart-container">
+                        <div class="card-body">
+                            <h5 class="card-title">Doanh Thu Năm @DateTime.Now.Year (Theo Danh Mục)</h5>
+                            @if (Model.CategoryRevenueSummaries != null && Model.CategoryRevenueSummaries.Any())
+                            {
+                                <canvas id="categoryRevenueChart"></canvas>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Không có dữ liệu doanh thu theo danh mục cho năm này.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <!-- Xu hướng mua sắm -->
+                <div class="col-md-6 mt-4">
+                    <div class="card border-0 shadow-sm chart-container extended-chart">
+                        <div class="card-body">
+                            <h5 class="card-title">Xu hướng Sản Phẩm Được Mua Năm @DateTime.Now.Year (Theo Tháng)</h5>
+                            @if (Model.FavoriteTrends != null && Model.FavoriteTrends.Any())
+                            {
+                                <canvas id="favoriteTrendChart"></canvas>
+
+                                <!-- Bảng hiển thị sản phẩm được mua nhiều nhất -->
+                                <h6 class="mt-4">Sản Phẩm Được Mua Nhiều Nhất Theo Tháng</h6>
+                                <table class="table table-bordered table-hover mt-2">
+                                    <thead class="bg-primary text-white">
+                                        <tr>
+                                            <th>Tháng</th>
+                                            <th>Sản Phẩm</th>
+                                            <th>Số Lượng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var trend in Model.FavoriteTrends.OrderBy(f => f.Month))
+                                        {
+                                            <tr>
+                                                <td>@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(trend.Month)</td>
+                                                <td>@(string.IsNullOrEmpty(trend.TopProductName) || trend.TopProductName == "N/A" ? "Không có" : trend.TopProductName)</td>
+                                                <td>@trend.TopProductQuantity.ToString("N0")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Không có dữ liệu xu hướng mua sắm cho năm này.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <!-- Đơn hàng theo tháng -->
+                <div class="col-md-6 mt-4">
+                    <div class="card border-0 shadow-sm chart-container">
+                        <div class="card-body">
+                            <h5 class="card-title">Đơn Hàng Năm @DateTime.Now.Year (Theo Tháng)</h5>
+                            @if (Model.MonthlyOrderTrends != null && Model.MonthlyOrderTrends.Any())
+                            {
+                                <canvas id="monthlyOrderChart"></canvas>
+                            }
+                            else
+                            {
+                                <p class="text-muted">Không có dữ liệu đơn hàng cho năm này.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút xuất báo cáo -->
+            <div class="mb-4 text-end">
+                <a asp-action="ExportReport" class="btn btn-success shadow-sm">
+                    <i class="fas fa-download me-2"></i> Xuất Excel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thêm Chart.js từ CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Chuẩn bị dữ liệu cho biểu đồ doanh thu theo tháng
+        const revenueLabels = [];
+        const salesRevenueData = [];
+        const importRevenueData = [];
+    @foreach (var summary in Model.RevenueSummaries.OrderBy(r => r.Period))
+    {
+        @: revenueLabels.push('Tháng ' + @summary.Period);
+        @: salesRevenueData.push(@summary.TotalSalesRevenue);
+        @: importRevenueData.push(@summary.TotalImportRevenue);
+    }
+
+        // Biểu đồ doanh thu theo tháng
+        const ctx = document.getElementById('revenueChart');
+        if (ctx) {
+            new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: revenueLabels,
+                    datasets: [
+                        {
+                            label: 'Doanh Thu Bán (VND)',
+                            data: salesRevenueData,
+                            backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Doanh Thu Nhập (VND)',
+                            data: importRevenueData,
+                            backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                            borderColor: 'rgba(34, 197, 94, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('vi-VN') + ' đ';
+                                }
+                            },
+                            grid: {
+                                color: "rgba(0, 0, 0, 0.05)"
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: "rgba(0, 0, 0, 0.8)",
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 12
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toLocaleString('vi-VN') + ' đ';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Chuẩn bị dữ liệu cho biểu đồ doanh thu theo danh mục
+        const categoryLabels = [];
+        const categoryData = [];
+    @foreach (var summary in Model.CategoryRevenueSummaries)
+    {
+        if (summary.CategoryName != null)
+        {
+            @: categoryLabels.push(decodeURIComponent('@summary.CategoryName'.replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))));
+            @: categoryData.push(@summary.TotalRevenue);
+        }
+    }
+
+        // Biểu đồ doanh thu theo danh mục
+        const ctxCategory = document.getElementById('categoryRevenueChart');
+        if (ctxCategory) {
+            new Chart(ctxCategory.getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        label: 'Doanh Thu (VND)',
+                        data: categoryData,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 159, 64, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: "rgba(0, 0, 0, 0.8)",
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 12
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed.toLocaleString('vi-VN') + ' đ';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Chuẩn bị dữ liệu cho biểu đồ xu hướng mua sắm
+        const favoriteLabels = [];
+        const favoriteData = [];
+        const topProductNames = [];
+        const topProductQuantities = [];
+    @foreach (var trend in Model.FavoriteTrends.OrderBy(f => f.Month))
+    {
+        @: favoriteLabels.push('Tháng ' + @trend.Month);
+        @: favoriteData.push(@trend.TotalLikes);
+        @: topProductNames.push(decodeURIComponent('@trend.TopProductName'.replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))));
+        @: topProductQuantities.push(@trend.TopProductQuantity);
+    }
+
+        // Biểu đồ xu hướng mua sắm
+        const favoriteCtx = document.getElementById('favoriteTrendChart');
+        if (favoriteCtx) {
+            new Chart(favoriteCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: favoriteLabels,
+                    datasets: [
+                        {
+                            label: 'Số lượng sản phẩm được mua',
+                            data: favoriteData,
+                            borderColor: '#FFCE56',
+                            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                            fill: true,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Số lượng'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('vi-VN');
+                                }
+                            },
+                            grid: {
+                                color: "rgba(0, 0, 0, 0.05)"
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Tháng'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: "rgba(0, 0, 0, 0.8)",
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 12
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toLocaleString('vi-VN');
+                                    }
+                                    return label;
+                                },
+                                afterLabel: function(context) {
+                                    const index = context.dataIndex;
+                                    return 'Sản phẩm hàng đầu: ' + topProductNames[index] + '\nSố lượng: ' + topProductQuantities[index].toLocaleString('vi-VN');
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Chuẩn bị dữ liệu cho biểu đồ đơn hàng theo tháng
+        const monthlyOrderLabels = [];
+        const monthlyPendingData = [];
+        const monthlyCancelledData = [];
+        const monthlyDeliveredData = [];
+        const monthlyProcessingData = [];
+        const monthlyShippedData = [];
+    @foreach (var trend in Model.MonthlyOrderTrends.OrderBy(t => t.Month))
+    {
+        @: monthlyOrderLabels.push('Tháng ' + @trend.Month);
+        @: monthlyPendingData.push(@trend.PendingOrders);
+        @: monthlyCancelledData.push(@trend.CancelledOrders);
+        @: monthlyDeliveredData.push(@trend.DeliveredOrders);
+        @: monthlyProcessingData.push(@trend.ProcessingOrders);
+        @: monthlyShippedData.push(@trend.ShippedOrders);
+    }
+
+        const monthlyOrderCtx = document.getElementById('monthlyOrderChart');
+        if (monthlyOrderCtx) {
+            new Chart(monthlyOrderCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: monthlyOrderLabels,
+                    datasets: [
+                        {
+                            label: 'Tổng Đơn',
+                            data: monthlyPendingData.map((v, i) => v + monthlyCancelledData[i] + monthlyDeliveredData[i] + monthlyProcessingData[i] + monthlyShippedData[i]),
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Đơn Hoàn Thành',
+                            data: monthlyDeliveredData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Đơn Hủy',
+                            data: monthlyCancelledData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Đang Xử Lý',
+                            data: monthlyProcessingData,
+                            backgroundColor: 'rgba(255, 206, 86, 0.8)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Đã Vận Chuyển',
+                            data: monthlyShippedData,
+                            backgroundColor: 'rgba(153, 102, 255, 0.8)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                callback: function(value) {
+                                    return value.toLocaleString('vi-VN');
+                                }
+                            },
+                            grid: {
+                                color: "rgba(0, 0, 0, 0.05)"
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: "rgba(0, 0, 0, 0.8)",
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 12
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toLocaleString('vi-VN');
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #60a5fa;
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+    }
+
+    h2, h4, h5, h6 {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h4 {
+        font-size: 1.25rem;
+    }
+
+    h5 {
+        font-size: 1.1rem;
+    }
+
+    h6 {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-outline-primary {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-outline-success {
+        border-color: #28a745;
+        color: #28a745;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-outline-success:hover {
+            background-color: #28a745;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-outline-warning {
+        border-color: #ffc107;
+        color: #ffc107;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-outline-warning:hover {
+            background-color: #ffc107;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-outline-secondary {
+        border-color: #6c757d;
+        color: #6c757d;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-outline-danger {
+        border-color: #dc3545;
+        color: #dc3545;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .form-control, .form-select {
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        padding: 8px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+    .badge {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        border-radius: 12px;
+    }
+
+    .stat-card {
+        border-radius: 8px;
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+        min-height: 140px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+    }
+
+        .stat-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 6px rgba(37, 99, 235, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .stat-card h3 {
+            font-size: 1.25rem;
+            margin: 0;
+        }
+
+        .stat-card h5 {
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .stat-card .btn {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+        }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .card-text {
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+
+    .table {
+        background-color: #ffffff;
+        border-radius: 8px;
+        table-layout: fixed;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+        .table th, .table td {
+            border-color: #e5e7eb;
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    .alert-info {
+        background-color: #e7f3ff;
+        border-color: #b8daff;
+        color: #004085;
+        border-radius: 8px;
+    }
+
+    /* Điều chỉnh để các ô biểu đồ đồng đều */
+    .chart-container {
+        height: 400px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .extended-chart {
+        height: 550px; /* Tăng chiều cao cho ô "Xu hướng Sản Phẩm Được Mua" */
+    }
+
+    .chart-container .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    canvas {
+        flex: 1;
+        width: 100% !important;
+        max-height: 300px !important;
+        min-height: 250px !important;
+    }
+</style>

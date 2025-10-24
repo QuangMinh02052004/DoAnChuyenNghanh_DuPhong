@@ -1,0 +1,45 @@
+﻿@model List<Bloomie.Models.ViewModels.ProductViewModel.ProductWithRating>
+
+@{
+    var searchColors = ViewBag.SearchColors as List<string> ?? new List<string>();
+    var searchPresentations = ViewBag.SearchPresentations as List<string> ?? new List<string>();
+}
+
+<h2>Kết quả tìm kiếm</h2>
+
+@if (searchColors.Any() || searchPresentations.Any())
+{
+    <p>
+        Kết quả tìm kiếm theo:
+        <strong>Màu sắc:</strong> @string.Join(", ", searchColors) 
+    </p>
+}
+
+@if (Model.Any())
+{
+    <div class="row">
+        @foreach (var product in Model)
+        {
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <img src="@product.Product.ImageUrl" class="card-img-top" alt="@product.Product.Name" />
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Product.Name</h5>
+                        <p class="card-text">@product.Product.Description</p>
+                        <p><strong>Giá:</strong> @product.Product.Price.ToString("N0") VNĐ</p>
+                        <p><strong>Đánh giá:</strong> @product.Rating.ToString("0.0") / 5</p>
+                        <p><strong>Màu sắc:</strong> @string.Join(", ", product.Colors)</p> <!-- Hiển thị nhiều màu -->
+                        <p><strong>Kiểu trình bày:</strong> @product.PresentationStyle</p>
+                        <p><strong>Chủ đề:</strong> @product.Occasion</p>
+                        <p><strong>Đối tượng:</strong> @product.Object</p>
+                        <p><strong>Loại hoa:</strong> @string.Join(", ", product.FlowerTypes)</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="text-center">Không tìm thấy sản phẩm phù hợp.</p>
+}

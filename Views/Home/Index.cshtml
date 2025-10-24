@@ -1,0 +1,614 @@
+﻿@model Bloomie.Models.ViewModels.ProductViewModel
+@{
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+<!-- Notification Container -->
+<div id="cartNotification" class="cart-notification">
+    <span id="cartNotificationMessage"></span>
+    <button onclick="closeNotification()" class="close-btn">×</button>
+</div>
+
+<!-- Sản phẩm mới -->
+<section class="product-section">
+    <h2>MẪU HOA MỚI NĂM 2025</h2>
+    @if (!Model.NewProducts.Any())
+    {
+        <div class="alert alert-info text-center shadow-sm rounded">
+            <i class="fas fa-info-circle me-2"></i> Không có sản phẩm mới nào.
+        </div>
+    }
+    else
+    {
+        <div class="swiper product-swiper">
+            <div class="swiper-wrapper">
+                @foreach (var item in Model.NewProducts.Take(10))
+                {
+                    <div class="swiper-slide">
+                        <div class="product-card position-relative">
+                            <span class="new-tag">Mới</span>
+                            @if (item.Product.DiscountPercentage.HasValue && item.Product.DiscountPercentage > 0)
+                            {
+                                <span class="promo-badge">SALE</span>
+                                <span class="freeship-tag">FREESHIP</span>
+                            }
+                            <a asp-controller="Product" asp-action="Display" asp-route-id="@item.Product.Id">
+                                <img src="@item.Product.ImageUrl" alt="@item.Product.Name" class="product-img" />
+                            </a>
+                            <h3 class="mt-3">@item.Product.Name</h3>
+                            <div class="price">
+                                @if (item.Product.DiscountPercentage.HasValue && item.Product.DiscountPercentage > 0)
+                                {
+                                    <div class="original-price">@item.Product.Price.ToString("#,##0") đ</div>
+                                    <div class="discounted-price">@item.Product.DiscountPrice.Value.ToString("#,##0") đ</div>
+                                }
+                                else
+                                {
+                                    <div class="discounted-price">@item.Product.Price.ToString("#,##0") đ</div>
+                                }
+                            </div>
+                            <!-- Hiển thị sao đánh giá -->
+                            <div class="rating mb-2">
+                                @{
+                                    int fullStars = (int)item.Rating;
+                                    bool hasHalfStar = (double)item.Rating - fullStars >= 0.5;
+                                    int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+                                    for (int i = 0; i < fullStars; i++)
+                                    {
+                                        <i class="bi bi-star-fill star-filled"></i>
+                                    }
+                                    if (hasHalfStar)
+                                    {
+                                        <i class="bi bi-star-half star-filled"></i>
+                                    }
+                                    for (int i = 0; i < emptyStars; i++)
+                                    {
+                                        <i class="bi bi-star star-empty"></i>
+                                    }
+                                }
+                                <span class="rating-score">(@item.Rating.ToString("0.0")/5)</span>
+                            </div>
+                            <!-- Icon giỏ hàng để thêm sản phẩm -->
+                            <button onclick="addToCartToCart(@item.Product.Id)" class="cart-icon" title="Thêm vào giỏ hàng">
+                                <i class="bi bi-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+        </div>
+    }
+</section>
+
+<!-- Sản phẩm bán chạy -->
+<section class="product-section">
+    <h2>HOA GIAO NHANH 60 PHÚT</h2>
+    @if (!Model.BestSellingProducts.Any())
+    {
+        <div class="alert alert-info text-center shadow-sm rounded">
+            <i class="fas fa-info-circle me-2"></i> Không có sản phẩm bán chạy nào.
+        </div>
+    }
+    else
+    {
+        <div class="product-grid">
+            @foreach (var item in Model.BestSellingProducts.Take(18))
+            {
+                <div class="product-card position-relative">
+                    @if (item.Product.DiscountPercentage.HasValue && item.Product.DiscountPercentage > 0)
+                    {
+                        <span class="promo-badge">SALE</span>
+                        <span class="freeship-tag">FREESHIP</span>
+                    }
+                    @if (item.Product.IsNew)
+                    {
+                        <span class="new-tag">NEW</span>
+                    }
+                    <a asp-controller="Product" asp-action="Display" asp-route-id="@item.Product.Id">
+                        <img src="@item.Product.ImageUrl" alt="@item.Product.Name" class="product-img" />
+                    </a>
+                    <h3 class="mt-3">@item.Product.Name</h3>
+                    <div class="price">
+                        @if (item.Product.DiscountPercentage.HasValue && item.Product.DiscountPercentage > 0)
+                        {
+                            <div class="original-price">@item.Product.Price.ToString("#,##0") đ</div>
+                            <div class="discounted-price">@item.Product.DiscountPrice.Value.ToString("#,##0") đ</div>
+                        }
+                        else
+                        {
+                            <div class="discounted-price">@item.Product.Price.ToString("#,##0") đ</div>
+                        }
+                    </div>
+                    <!-- Hiển thị sao đánh giá -->
+                    <div class="rating mb-2">
+                        @{
+                            int fullStars = (int)item.Rating;
+                            bool hasHalfStar = (double)item.Rating - fullStars >= 0.5;
+                            int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+                            for (int i = 0; i < fullStars; i++)
+                            {
+                                <i class="bi bi-star-fill star-filled"></i>
+                            }
+                            if (hasHalfStar)
+                            {
+                                <i class="bi bi-star-half star-filled"></i>
+                            }
+                            for (int i = 0; i < emptyStars; i++)
+                            {
+                                <i class="bi bi-star star-empty"></i>
+                            }
+                        }
+                        <span class="rating-score">(@item.Rating.ToString("0.0")/5)</span>
+                    </div>
+                    <div class="text-muted mb-2">Đã bán: @item.Product.QuantitySold</div>
+                    <!-- Icon giỏ hàng để thêm sản phẩm -->
+                    <button onclick="addToCartToCart(@item.Product.Id)" class="cart-icon" title="Thêm vào giỏ hàng">
+                        <i class="bi bi-cart-plus"></i>
+                    </button>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+@* <!-- Sản phẩm liên quan --> *@
+@* <section class="product-section"> *@
+@*     <h2>CÓ THỂ BẠN SẼ THÍCH</h2> *@
+@*     @if (!Model.RelatedProducts.Any()) *@
+@*     { *@
+@*         <div class="alert alert-info text-center shadow-sm rounded"> *@
+@*             <i class="fas fa-info-circle me-2"></i> Không có sản phẩm liên quan nào. *@
+@*         </div> *@
+@*     } *@
+@*     else *@
+@*     { *@
+@*         <div class="product-grid"> *@
+@*             @foreach (var item in Model.RelatedProducts.Take(10)) *@
+@*             { *@
+@*                 <div class="product-card position-relative"> *@
+@*                     @if (item.Product.DiscountPercentage.HasValue && item.Product.DiscountPercentage > 0) *@
+@*                     { *@
+@*                         <span class="promo-badge">SALE</span> *@
+@*                         <span class="freeship-tag">FREESHIP</span> *@
+@*                     } *@
+@*                     @if (item.Product.IsNew) *@
+@*                     { *@
+@*                         <span class="new-tag">NEW</span> *@
+@*                     } *@
+@*                     <a asp-controller="Product" asp-action="Display" asp-route-id="@item.Product.Id"> *@
+@*                         <img src="@item.Product.ImageUrl" alt="@item.Product.Name" class="product-img" /> *@
+@*                     </a> *@
+@*                     <h3 class="mt-3">@item.Product.Name</h3> *@
+@*                     <div class="price"> *@
+@*                         @if (item.Product.DiscountPercentage.HasValue && item.Product.DiscountPercentage > 0) *@
+@*                         { *@
+@*                             <div class="original-price">@item.Product.Price.ToString("#,##0") đ</div> *@
+@*                             <div class="discounted-price">@item.Product.DiscountPrice.Value.ToString("#,##0") đ</div> *@
+@*                         } *@
+@*                         else *@
+@*                         { *@
+@*                             <div class="discounted-price">@item.Product.Price.ToString("#,##0") đ</div> *@
+@*                         } *@
+@*                     </div> *@
+@*                     <!-- Hiển thị sao đánh giá --> *@
+@*                     <div class="rating mb-2"> *@
+@*                         @{ *@
+@*                             int fullStars = (int)item.Rating; *@
+@*                             bool hasHalfStar = item.Rating - fullStars >= 0.5; *@
+@*                             int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0); *@
+
+@*                             for (int i = 0; i < fullStars; i++) *@
+@*                             { *@
+@*                                 <i class="bi bi-star-fill star-filled"></i> *@
+@*                             } *@
+@*                             if (hasHalfStar) *@
+@*                             { *@
+@*                                 <i class="bi bi-star-half star-filled"></i> *@
+@*                             } *@
+@*                             for (int i = 0; i < emptyStars; i++) *@
+@*                             { *@
+@*                                 <i class="bi bi-star star-empty"></i> *@
+@*                             } *@
+@*                         } *@
+@*                         <span class="rating-score">(@item.Rating.ToString("0.0")/5)</span> *@
+@*                     </div> *@
+@*                     <div class="text-muted mb-2">Đã bán: @item.Product.QuantitySold</div> *@
+@*                     <!-- Icon giỏ hàng để thêm sản phẩm --> *@
+@*                     <a asp-controller="ShoppingCart" asp-action="AddToCart" asp-route-productId="@item.Product.Id" class="cart-icon" title="Thêm vào giỏ hàng"> *@
+@*                         <i class="bi bi-cart-plus"></i> *@
+@*                     </a> *@
+@*                 </div> *@
+@*             } *@
+@*         </div> *@
+@*     } *@
+@* </section> *@
+
+@section Scripts {
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        // Khai báo giả định để IntelliSense nhận diện Swiper
+        var Swiper = Swiper || function () {};
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof Swiper !== 'undefined') {
+                const productSwiperElement = document.querySelector('.product-swiper');
+                if (productSwiperElement) {
+                    const productSwiper = new Swiper('.product-swiper', {
+                        slidesPerView: 5,
+                        spaceBetween: 20,
+                        navigation: {
+                            nextEl: '.swiper-button-prev',
+                            prevEl: '.swiper-button-next',
+                        },
+                        loop: true,
+                        autoplay: {
+                            delay: 3000,
+                            disableOnInteraction: false,
+                        },
+                        breakpoints: {
+                            320: {
+                                slidesPerView: 1,
+                                spaceBetween: 10,
+                            },
+                            768: {
+                                slidesPerView: 2,
+                                spaceBetween: 15,
+                            },
+                            1200: {
+                                slidesPerView: 5,
+                                spaceBetween: 20,
+                            },
+                        },
+                        on: {
+                            init: function () {
+                                console.log('Product Swiper initialized successfully');
+                            },
+                            slideChange: function () {
+                                console.log('Product slide changed to index:', this.activeIndex);
+                            },
+                        },
+                    });
+                }
+            } else {
+                console.warn('Swiper library is not loaded.');
+            }
+        });
+
+        function addToCartToCart(productId) {
+            const url = `/ShoppingCart/AddToCart?productId=${productId}`;
+            console.log('Request URL:', url);
+
+            fetch(url, {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => {
+                console.log('Response Status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response Data:', data);
+                const notification = document.getElementById('cartNotification');
+                const notificationMessage = document.getElementById('cartNotificationMessage');
+
+                if (data.success) {
+                    console.log('Added to cart successfully');
+                    // Cập nhật số lượng trên biểu tượng giỏ hàng
+                    const cartCountElement = document.querySelector('#cartCount');
+                    if (cartCountElement && data.cartCount !== undefined) {
+                        cartCountElement.textContent = data.cartCount;
+                    }
+                    // Hiển thị thông báo tùy chỉnh
+                    notificationMessage.textContent = data.message || 'Đã thêm sản phẩm vào giỏ hàng!';
+                    notification.classList.add('show');
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                    }, 3000); // Ẩn sau 3 giây
+                } else {
+                    notificationMessage.textContent = data.message || 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!';
+                    notification.classList.add('show', 'error');
+                    setTimeout(() => {
+                        notification.classList.remove('show', 'error');
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+                const notification = document.getElementById('cartNotification');
+                const notificationMessage = document.getElementById('cartNotificationMessage');
+                notificationMessage.textContent = 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!';
+                notification.classList.add('show', 'error');
+                setTimeout(() => {
+                    notification.classList.remove('show', 'error');
+                }, 3000);
+            });
+        }
+
+        function closeNotification() {
+            const notification = document.getElementById('cartNotification');
+            notification.classList.remove('show', 'error');
+        }
+    </script>
+}
+
+<style>
+    /* Notification Styles */
+    .cart-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: #fff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-20px);
+        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+        z-index: 1000;
+    }
+
+        .cart-notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .cart-notification.error {
+            background: #D0021B;
+        }
+
+        .cart-notification .close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            margin-left: 15px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+            .cart-notification .close-btn:hover {
+                color: #ddd;
+            }
+
+    .product-section {
+        padding: 40px 0;
+    }
+
+        .product-section h2 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #D0021B;
+            margin-bottom: 35px;
+            text-align: center;
+            position: relative;
+        }
+
+            .product-section h2::after {
+                content: '';
+                width: 80px;
+                height: 4px;
+                background: #D0021B;
+                position: absolute;
+                bottom: -12px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+    .text-muted {
+        color: #666 !important;
+    }
+
+    .product-swiper {
+        width: 100%;
+        padding: 20px 0;
+        position: relative;
+    }
+
+    .swiper-slide {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: auto;
+    }
+
+    .swiper-button-prev,
+    .swiper-button-next {
+        color: #000;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .swiper-button-prev:after,
+        .swiper-button-next:after {
+            font-size: 20px;
+        }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 25px;
+        justify-content: center;
+    }
+
+    .product-card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-align: center;
+        min-height: 460px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+    }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+    .product-img {
+        width: 100%;
+        height: 230px;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border-radius: 10px;
+    }
+
+    .product-card h3 {
+        font-family: 'Roboto', sans-serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #333;
+        height: 50px;
+        line-height: 1.2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .product-card .price {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #D0021B;
+        margin-bottom: 10px;
+        flex-grow: 0;
+    }
+
+    .product-card .original-price {
+        font-size: 1rem;
+        color: #666;
+        text-decoration: line-through;
+    }
+
+    .product-card .discounted-price {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #D0021B;
+    }
+
+    /* Định dạng sao đánh giá */
+    .rating {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        margin-bottom: 10px;
+    }
+
+    .star-filled {
+        color: #FFD700; /* Màu vàng cho sao đầy và sao nửa */
+        font-size: 1rem;
+    }
+
+    .star-empty {
+        color: #ddd; /* Màu xám nhạt cho sao rỗng */
+        font-size: 1rem;
+    }
+
+    .rating-score {
+        font-size: 0.9rem;
+        color: #666;
+        margin-left: 6px;
+    }
+
+    /* Định dạng icon giỏ hàng */
+    .cart-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: #ffb6c1; /* Màu hồng nhạt giống hình */
+        border: none; /* Loại bỏ viền */
+        border-radius: 50%;
+        color: #fff;
+        font-size: 1.3rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        box-shadow: none; /* Đảm bảo không có bóng viền */
+    }
+
+        .cart-icon:hover {
+            background: #ff8c99; /* Màu đậm hơn khi hover */
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(255, 140, 153, 0.5);
+        }
+
+    .new-tag {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #D0021B;
+        color: #fff;
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        border-radius: 5px;
+        z-index: 1;
+    }
+
+    .promo-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: #D0021B;
+        color: #fff;
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        border-radius: 5px;
+        z-index: 1;
+    }
+
+    .freeship-tag {
+        position: absolute;
+        top: 45px;
+        left: 15px;
+        background: #FFA500;
+        color: #fff;
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        border-radius: 5px;
+        z-index: 1;
+    }
+
+    .alert-info {
+        border-radius: 8px;
+        font-size: 1.05rem;
+        padding: 15px;
+        margin-bottom: 25px;
+        background-color: #fffafa;
+        color: #666;
+        border: 1px solid #ffb6c1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+</style>

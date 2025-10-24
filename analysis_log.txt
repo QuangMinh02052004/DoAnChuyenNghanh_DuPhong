@@ -1,0 +1,28 @@
+Processing image: C:\Users\KHOA\AppData\Local\Temp\0253caf3e41e45a3bcfd2a9a9f9672de.jpg
+Result: {"success": true, "colors": ["nâu nhạt", "nâu cà phê", "đỏ hồng", "nâu"], "presentation": "Lẵng hoa mini"}
+Processing image: C:\Users\KHOA\AppData\Local\Temp\65e2eabfcc0a4404969df99eff03f41e.jpg
+Result: {"success": true, "colors": ["nâu nhạt", "nâu cà phê", "cam", "nâu socola"], "presentation": "Lẵng hoa mini"}
+Processing image: C:\Users\KHOA\AppData\Local\Temp\72d6b050a0d541919b6e3ae7d0f98e95.jpg
+Result: {"success": true, "colors": ["vàng đậm", "nâu socola", "cam", "nâu nhạt"], "presentation": "Lẵng hoa mini"}
+Processing image: C:\Users\KHOA\AppData\Local\Temp\4a303b257df84fa5bbeb74643c525cc8.jpg
+Result: {"success": true, "colors": ["nâu", "nâu cà phê", "cam san hô", "hồng san hô"], "presentation": "Lẵng hoa mini"}
+Processing image: C:\Users\KHOA\AppData\Local\Temp\bb8c1a374d40459e9917642cac732b97.jpg
+Processing image: C:\Users\KHOA\AppData\Local\Temp\506c1d5fbd654d98806ec9bff33d234a.jpg
+Result: {"success": true, "colors": ["cam san hô", "hồng san hô", "nâu", "nâu cà phê"], "presentation": "Lẵng hoa mini"}
+Result: {"success": true, "colors": ["nâu socola", "nâu nhạt", "cam đào", "vàng mù tạt"], "presentation": "Lẵng hoa mini"}
+Processing image: C:\Users\KHOA\AppData\Local\Temp\24e8f81b6aa54d129fdfa6e119201bc5.jpg
+Result: {"success": true, "colors": ["nâu nhạt", "vàng cam", "nâu cà phê", "nâu socola"], "presentation": "Lẵng hoa mini"}
+Processing image: C:\Users\KHOA\AppData\Local\Temp\1fb20d7904454623b1a847d03df05b12.jpg
+Result: {"success": true, "colors": ["nâu socola", "vàng mù tạt", "cam đào", "nâu nhạt"], "presentation": "Lẵng hoa mini"}
+Processing image: C:\Users\KHOA\AppData\Local\Temp\faed2969d6ad47829c3d08c9d042c267.jpg
+Result: {"success": true, "colors": ["vàng cam", "nâu nhạt", "nâu socola", "nâu cà phê"], "presentation": "Lẵng hoa mini"}
+Processing image: C:\Users\KHOA\AppData\Local\Temp\79c21ff7161c4a1e89916714a0640ab1.jpg
+Result: {"success": true, "colors": ["nâu socola", "nâu cà phê", "vàng mù tạt", "cam"], "presentation": "Lẵng hoa mini"}
+Processing image: C:\Users\KHOA\AppData\Local\Temp\69da5f659b5147f9a1686263baeefd4c.jpg
+Result: {"success": true, "colors": ["hồng san hô", "xanh pastel", "nâu cà phê", "nâu"], "presentation": "Lẵng hoa mini"}
+Processing image: C:\Users\KHOA\AppData\Local\Temp\8ae14dcf69ff47f48933f20066e59754.jpg
+Result: {"success": true, "colors": ["đỏ đậm", "cam", "nâu cà phê", "nâu socola"], "presentation": "Lẵng hoa mini"}
+Processing image: C:\Users\KHOA\AppData\Local\Temp\0198856e430a4e3b916416bc2cef128c.jpg
+Result: {"success": true, "colors": ["nâu cà phê", "nâu", "nâu nhạt", "đỏ đậm"], "presentation": "Lẵng hoa mini"}
+Processing image: C:\Users\KHOA\AppData\Local\Temp\857ab5a1c06e4005acfa73c2a7faa68f.jpg
+Result: {"success": true, "colors": ["nâu socola", "vàng mù tạt", "nâu cà phê", "cam cháy"], "presentation": "Lẵng hoa mini"}

@@ -1,0 +1,595 @@
+﻿@using Bloomie.Data
+@model ApplicationUser
+
+@{
+    ViewData["Title"] = "Hồ sơ người dùng";
+    Layout = "~/Views/Shared/_IdentityLayout.cshtml";
+}
+
+<div class="profile-wrapper">
+    <div class="profile-card">
+        <div class="profile-header text-center">
+            <h2 class="profile-title">Hồ sơ người dùng</h2>
+            <p class="profile-subtitle">Quản lý thông tin cá nhân của bạn</p>
+        </div>
+        <div class="profile-content">
+            <div class="avatar-section text-center mb-2">
+                <img src="@(string.IsNullOrEmpty(Model.ProfileImageUrl) ? "/profile/default-avatar.png" : Model.ProfileImageUrl)" alt="Ảnh đại diện" class="avatar-img" id="current-avatar" />
+                <div class="mt-2">
+                    <form asp-action="UpdateProfileImage" asp-controller="Account" method="post" enctype="multipart/form-data" class="d-inline" id="profileImageForm">
+                        <input type="file" name="ProfileImage" id="fileInput" class="d-none" accept="image/*" onchange="previewImage(event)" />
+                        <div class="mb-1">
+                            <img id="imagePreview" alt="Xem trước ảnh" class="avatar-preview d-none" />
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="openImageOptions()">Thay đổi ảnh</button>
+                        <button type="submit" class="btn btn-primary btn-sm d-none" id="submitButton">Lưu ảnh</button>
+                    </form>
+                </div>
+            </div>
+            <div class="profile-details">
+                <div class="detail-item">
+                    <span class="label">Tên người dùng:</span>
+                    <span class="value">@Model.UserName</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Email:</span>
+                    <span class="value">@Model.Email</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Họ và tên:</span>
+                    <span class="value">@(Model.FullName ?? "Chưa cập nhật")</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Số điện thoại:</span>
+                    <span class="value">@(Model.PhoneNumber ?? "Chưa cập nhật")</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Vai trò:</span>
+                    <span class="value">@(ViewBag.Role ?? "Chưa xác định")</span>
+                </div>
+            </div>
+            <div class="profile-actions text-center mt-2">
+                <a asp-action="Index" asp-controller="Home" class="btn btn-secondary btn-lg mr-2">Quay về trang chủ</a>
+                <a asp-action="UpdateAccount" asp-controller="Account" class="btn btn-primary btn-lg">Chỉnh sửa thông tin</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal chọn tùy chọn -->
+<div id="imageOptionsModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h4 class="modal-title">Thay đổi ảnh đại diện</h4>
+        <button class="btn btn-outline-secondary mb-2" onclick="selectFile()">Chọn ảnh từ thiết bị</button>
+        <button class="btn btn-outline-secondary mb-2" onclick="openCameraModal()">Chụp ảnh mới</button>
+        <button class="btn btn-danger" onclick="closeModal()">Đóng</button>
+    </div>
+</div>
+
+<!-- Modal camera -->
+<div id="cameraModal" class="modal" style="display: none;">
+    <div class="modal-content camera-modal-content">
+        <h4 class="modal-title">Chụp ảnh đại diện</h4>
+        <div id="cameraSection">
+            <video id="video" autoplay playsinline class="camera-video"></video>
+            <img id="capturedImage" class="camera-captured d-none" alt="Ảnh đã chụp" />
+            <div class="camera-actions mt-2">
+                <button id="captureBtn" class="btn btn-primary" onclick="capturePhoto()">Chụp ảnh</button>
+                <button id="saveBtn" class="btn btn-success d-none" onclick="savePhoto()">Lưu</button>
+                <button id="cancelBtn" class="btn btn-danger d-none" onclick="cancelPhoto()">Hủy</button>
+                <button class="btn btn-secondary" onclick="closeCameraModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* General Styling */
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(rgba(255, 250, 250, 0.8), rgba(255, 182, 193, 0.3)), url('https://images.unsplash.com/photo-1519378058457-4c29a0a2efac?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    .profile-wrapper {
+        max-width: 1100px;
+        margin: 15px;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        width: 95%;
+    }
+
+    .profile-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        transition: transform 0.3s ease;
+    }
+
+        .profile-card:hover {
+            transform: translateY(-3px);
+        }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-title {
+        font-size: 30px;
+        color: #D0021B;
+        font-weight: 700;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 8px;
+    }
+
+        .profile-title::after {
+            content: '';
+            width: 40px;
+            height: 3px;
+            background: #D0021B;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+    .profile-subtitle {
+        font-size: 16px;
+        color: #666;
+        margin-top: 6px;
+    }
+
+    /* Avatar Section */
+    .avatar-section {
+        position: relative;
+    }
+
+    .avatar-img {
+        width: 150px;
+        height: 150px;
+        border: 4px solid #fff;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 50%;
+    }
+
+        .avatar-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+    .avatar-preview {
+        width: 120px;
+        height: 120px;
+        border: 3px solid #D0021B;
+        margin-top: 10px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    /* Profile Details */
+    .profile-details {
+        display: grid;
+        gap: 12px;
+        margin-top: 20px;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 10px;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+        transition: transform 0.3s ease;
+    }
+
+        .detail-item:hover {
+            transform: translateX(4px);
+        }
+
+    .label {
+        font-weight: 600;
+        color: #34495e;
+        min-width: 150px;
+        font-size: 16px;
+    }
+
+    .value {
+        color: #2c3e50;
+        font-size: 16px;
+        font-weight: 400;
+    }
+
+    /* Actions */
+    .profile-actions {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+        .profile-actions .btn-primary {
+            background-color: #D0021B;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(208, 2, 27, 0.2);
+        }
+
+            .profile-actions .btn-primary:hover {
+                background-color: #F5A623;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 10px rgba(245, 166, 35, 0.4);
+            }
+
+        .profile-actions .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(108, 117, 125, 0.2);
+        }
+
+            .profile-actions .btn-secondary:hover {
+                background-color: #5a6268;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 10px rgba(90, 98, 104, 0.4);
+            }
+
+    .btn-outline-secondary,
+    .btn-danger,
+    .btn-success,
+    .btn-sm {
+        padding: 8px 18px;
+        font-size: 14px;
+        border-radius: 8px;
+    }
+
+    .btn-outline-secondary {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: #fff;
+        }
+
+    .btn-danger {
+        background-color: #e74c3c;
+        border: none;
+    }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            box-shadow: 0 3px 8px rgba(231, 76, 60, 0.2);
+        }
+
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+    }
+
+        .btn-success:hover {
+            background-color: #218838;
+            box-shadow: 0 3px 8px rgba(40, 167, 69, 0.2);
+        }
+
+    /* Modal Styling */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        max-width: 400px;
+        width: 90%;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .camera-modal-content {
+        max-width: 650px;
+        width: 90%;
+    }
+
+    .modal-title {
+        font-size: 20px;
+        color: #D0021B;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .camera-video,
+    .camera-captured {
+        width: 100%;
+        max-width: 550px;
+        height: auto;
+        border-radius: 10px;
+        border: 3px solid #D0021B;
+        background: #000;
+        margin: 0 auto;
+    }
+
+    .camera-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+
+    .d-none {
+        display: none;
+    }
+
+    /* Animations */
+    keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Responsive */
+    media (max-width: 768px) {
+        .profile-wrapper
+
+    {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .label {
+        min-width: 100%;
+        margin-bottom: 4px;
+    }
+
+    .camera-video,
+    .camera-captured {
+        max-width: 100%;
+    }
+
+    .profile-actions .btn-primary,
+    .profile-actions .btn-secondary {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .profile-actions .btn-secondary {
+        margin-right: 0;
+    }
+
+    }
+</style>
+
+<script>
+    let profileStream = null;
+    let capturedBlob = null;
+
+    function openImageOptions() {
+        document.getElementById('imageOptionsModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('imageOptionsModal').style.display = 'none';
+    }
+
+    function selectFile() {
+        document.getElementById('fileInput').click();
+        closeModal();
+    }
+
+    function openCameraModal() {
+        const cameraModal = document.getElementById('cameraModal');
+        const video = document.getElementById('video');
+        const capturedImage = document.getElementById('capturedImage');
+        const captureBtn = document.getElementById('captureBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        capturedBlob = null;
+        capturedImage.classList.add('d-none');
+        video.classList.remove('d-none');
+        captureBtn.classList.remove('d-none');
+        saveBtn.classList.add('d-none');
+        cancelBtn.classList.add('d-none');
+
+        cameraModal.style.display = 'flex';
+        closeModal();
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("Trình duyệt không hỗ trợ camera. Vui lòng thử trình duyệt khác.");
+            closeCameraModal();
+            return;
+        }
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                profileStream = stream;
+                video.srcObject = stream;
+                video.play().catch(err => {
+                    console.error("Lỗi khi phát luồng video: ", err);
+                    alert("Không thể phát luồng video: " + err.message);
+                    closeCameraModal();
+                });
+            })
+            .catch(err => {
+                console.error("Lỗi khi truy cập camera: ", err);
+                if (err.name === "NotAllowedError") {
+                    alert("Quyền truy cập camera bị từ chối. Vui lòng cấp quyền trong cài đặt trình duyệt.");
+                } else if (err.name === "NotFoundError") {
+                    alert("Không tìm thấy camera. Vui lòng kiểm tra thiết bị.");
+                } else {
+                    alert("Không thể mở camera. Chi tiết lỗi: " + err.message);
+                }
+                closeCameraModal();
+            });
+    }
+
+    function capturePhoto() {
+        const video = document.getElementById('video');
+        const capturedImage = document.getElementById('capturedImage');
+        const captureBtn = document.getElementById('captureBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(blob => {
+            if (!blob) {
+                alert("Không thể tạo ảnh từ video. Vui lòng thử lại.");
+                return;
+            }
+
+            capturedBlob = blob;
+            capturedImage.src = URL.createObjectURL(blob);
+            capturedImage.classList.remove('d-none');
+            video.classList.add('d-none');
+            captureBtn.classList.add('d-none');
+            saveBtn.classList.remove('d-none');
+            cancelBtn.classList.remove('d-none');
+
+            stopCameraStream();
+        }, 'image/jpeg', 0.9);
+    }
+
+    function savePhoto() {
+        if (!capturedBlob) {
+            alert("Không có ảnh để lưu. Vui lòng chụp lại.");
+            return;
+        }
+
+        const file = new File([capturedBlob], 'photo.jpg', { type: 'image/jpeg' });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        const form = document.getElementById('profileImageForm');
+        form.querySelector('#fileInput').files = dataTransfer.files;
+
+        const preview = document.getElementById('imagePreview');
+        const currentAvatar = document.getElementById('current-avatar');
+        preview.src = URL.createObjectURL(capturedBlob);
+        preview.classList.remove('d-none');
+        currentAvatar.classList.add('d-none');
+
+        form.submit();
+        closeCameraModal();
+    }
+
+    function cancelPhoto() {
+        const video = document.getElementById('video');
+        const capturedImage = document.getElementById('capturedImage');
+        const captureBtn = document.getElementById('captureBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        capturedBlob = null;
+        capturedImage.classList.add('d-none');
+        video.classList.remove('d-none');
+        captureBtn.classList.remove('d-none');
+        saveBtn.classList.add('d-none');
+        cancelBtn.classList.add('d-none');
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                profileStream = stream;
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(err => {
+                console.error("Lỗi khi truy cập lại camera: ", err);
+                alert("Không thể mở lại camera. Vui lòng thử lại.");
+                closeCameraModal();
+            });
+    }
+
+    function stopCameraStream() {
+        if (profileStream) {
+            profileStream.getTracks().forEach(track => track.stop());
+            profileStream = null;
+        }
+    }
+
+    function closeCameraModal() {
+        const cameraModal = document.getElementById('cameraModal');
+        const video = document.getElementById('video');
+        stopCameraStream();
+        video.srcObject = null;
+        cameraModal.style.display = 'none';
+    }
+
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById('imagePreview');
+        const currentAvatar = document.getElementById('current-avatar');
+        const submitButton = document.getElementById('submitButton');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+                currentAvatar.classList.add('d-none');
+                submitButton.classList.remove('d-none');
+            };
+            reader.onerror = function (err) {
+                console.error("Lỗi khi đọc file ảnh: ", err);
+                alert("Không thể đọc file ảnh. Vui lòng thử lại.");
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.classList.add('d-none');
+            currentAvatar.classList.remove('d-none');
+            submitButton.classList.add('d-none');
+        }
+    }
+</script>

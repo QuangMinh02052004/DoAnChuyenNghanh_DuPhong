@@ -1,0 +1,230 @@
+﻿@model Bloomie.Areas.Admin.Models.AdjustInventoryViewModel
+@using Bloomie.Models.Entities
+
+@{
+    ViewData["Title"] = "Điều chỉnh kho";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var availableBatches = ViewData["AvailableBatches"] as List<Batch>;
+}
+
+<div class="container-fluid mt-2 p-0">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <!-- Header -->
+            <h2 class="mb-4 fw-bold">
+                <i class="fas fa-adjust me-2"></i> Điều chỉnh kho - @Model.ProductName
+            </h2>
+
+            <!-- Success/Error Messages -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+            }
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <p>@error.ErrorMessage</p>
+                    }
+                </div>
+            }
+
+            <!-- Current Stock Info -->
+            <p class="text-muted mb-4"><strong>Số lượng tồn kho hiện tại:</strong> @ViewData["CurrentStock"]</p>
+
+            <!-- Form -->
+            <form asp-action="Adjust" method="post">
+                <input type="hidden" asp-for="FlowerTypeId" />
+                <input type="hidden" asp-for="ProductName" />
+                <input type="hidden" name="currentPage" value="@ViewData["CurrentPage"]" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Số lượng giảm -->
+                <div class="form-group mb-4">
+                    <label asp-for="Quantity" class="control-label">Số lượng giảm</label>
+                    <input asp-for="Quantity" class="form-control" type="number" min="1" required />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+
+                <!-- Loại điều chỉnh -->
+                <div class="form-group mb-4">
+                    <label asp-for="AdjustmentType" class="control-label">Loại điều chỉnh</label>
+                    <select asp-for="AdjustmentType" class="form-control" required>
+                        <option value="">Chọn loại điều chỉnh</option>
+                        <option value="@((int)AdjustmentType.Damaged)">Hoa hỏng</option>
+                        <option value="@((int)AdjustmentType.Lost)">Hoa mất</option>
+                        <option value="@((int)AdjustmentType.Other)">Khác</option>
+                    </select>
+                    <span asp-validation-for="AdjustmentType" class="text-danger"></span>
+                </div>
+
+                <!-- Lô hàng -->
+                <div class="form-group mb-4">
+                    <label asp-for="BatchId" class="control-label">Lô hàng</label>
+                    <select asp-for="BatchId" class="form-control" required>
+                        <option value="">Chọn lô hàng</option>
+                        @foreach (var batch in availableBatches)
+                        {
+                            <option value="@batch.Id">
+                                Lô @batch.Id - @batch.Supplier.Name (Nhập ngày @batch.ImportDate.ToString("dd/MM/yyyy"), Hết hạn @batch.ExpiryDate.ToString("dd/MM/yyyy"))
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="BatchId" class="text-danger"></span>
+                </div>
+
+                <!-- Lý do -->
+                <div class="form-group mb-4">
+                    <label asp-for="Reason" class="control-label">Lý do</label>
+                    <input asp-for="Reason" class="form-control" required />
+                    <span asp-validation-for="Reason" class="text-danger"></span>
+                </div>
+
+                <!-- Submit -->
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary me-2">Điều chỉnh</button>
+                    <a asp-action="FlowerTypes" asp-route-pageNumber="@ViewData["CurrentPage"]" class="btn btn-outline-secondary">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #60a5fa;
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+        --text-muted: #6b7280;
+    }
+
+    h2 {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .control-label {
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        font-size: 1rem;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        padding: 8px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+    select.form-control {
+        appearance: none;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%231e293b" d="M7 10l5 5 5-5z"/></svg>') no-repeat right 15px center;
+        background-size: 12px;
+        padding-right: 35px;
+    }
+
+    .text-danger {
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-outline-secondary {
+        border-color: #6b7280;
+        color: #6b7280;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #4b5563;
+            border-color: #4b5563;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.querySelector("form").addEventListener("submit", function (event) {
+            var quantity = parseInt(document.querySelector("input[name='Quantity']").value);
+            if (quantity <= 0) {
+                event.preventDefault();
+                alert("Số lượng giảm phải lớn hơn 0!");
+                return;
+            }
+
+            var currentStock = @ViewData["CurrentStock"];
+            if (quantity > currentStock) {
+                event.preventDefault();
+                alert("Số lượng giảm không được lớn hơn số lượng tồn kho (" + currentStock + ")!");
+                return;
+            }
+        });
+    </script>
+}

@@ -1,0 +1,285 @@
+﻿@model Bloomie.Models.ViewModels.AssignSubCategoriesViewModel
+@{
+    ViewData["Title"] = "Gán Danh Mục Con";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid mt-2 p-0">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-dark">
+                    <i class="fas fa-sitemap text-primary me-2"></i> Gán Danh Mục Con
+                </h2>
+            </div>
+
+            <!-- Alerts for Success/Error Messages -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Form -->
+            <form asp-action="AssignSubCategories" method="post">
+                <div class="form-group mb-4">
+                    <label asp-for="ParentCategoryId" class="form-label fw-medium">Danh mục cha</label>
+                    <select asp-for="ParentCategoryId" class="form-control" required onchange="updateSubCategories()">
+                        <option value="">Chọn danh mục cha</option>
+                        @foreach (var category in Model.ParentCategories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ParentCategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="form-label fw-medium">Danh mục con</label>
+                    <div id="subCategoriesList" class="table-responsive">
+                        <table class="table table-hover table-bordered mb-0">
+                            <tbody id="subCategoriesTable">
+                                @for (int i = 0; i < Model.SubCategories.Count; i++)
+                                {
+                                    var category = Model.SubCategories[i];
+                                    <tr class="subcategory-item">
+                                        <td class="text-left subcategory-name">
+                                            <div class="form-check mb-0">
+                                                <input type="checkbox" name="SubCategoryIds" value="@category.Id" class="form-check-input"
+                                                @(Model.SubCategoryIds.Contains(category.Id) ? "checked" : "") />
+                                                <label class="form-check-label">@category.Name</label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (ViewData.ModelState[""]?.Errors.Any() == true)
+                    {
+                        <span class="text-danger">@ViewData.ModelState[""].Errors.First().ErrorMessage</span>
+                    }
+                </div>
+
+                <div class="form-group mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary shadow-sm" data-bs-toggle="tooltip" data-bs-title="Gán danh mục con">
+                        <i class="fas fa-check me-2"></i> Gán
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary shadow-sm" data-bs-toggle="tooltip" data-bs-title="Quay lại danh sách">
+                        <i class="fas fa-arrow-left me-2"></i> Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #60a5fa;
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+    }
+
+    h2 {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .form-label {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+        font-weight: 500;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        padding: 8px;
+        font-size: 0.9rem;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.2s ease;
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+    .form-check-input {
+        margin-top: 0.25rem;
+        border-radius: 4px;
+    }
+
+    .form-check-label {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        color: #333;
+    }
+
+    .text-danger {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.85rem;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-secondary {
+        background-color: #6b7280;
+        border-color: #6b7280;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+            border-color: #4b5563;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .alert {
+        border-radius: 6px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        padding: 12px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background-color: #d1fae5;
+        border-color: #6ee7b7;
+        color: #065f46;
+    }
+
+    .alert-danger {
+        background-color: #fee2e2;
+        border-color: #f87171;
+        color: #991b1b;
+    }
+
+    .alert-dismissible .btn-close {
+        padding: 12px;
+    }
+
+    .table {
+        background-color: #ffffff;
+        border-radius: 8px;
+        table-layout: fixed;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+        .table th, .table td {
+            border-color: #e5e7eb;
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    .table-bordered td.text-left {
+        text-align: left !important;
+    }
+
+    .subcategory-name {
+        white-space: normal;
+        overflow-wrap: break-word;
+        max-width: 100%;
+        line-height: 1.4;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function () {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        });
+
+        // Pass data from Razor to JavaScript, only Id and Name
+        const subCategoriesData = @Html.Raw(Json.Serialize(Model.SubCategories.Select(c => new { id = c.Id, name = c.Name })));
+        const selectedSubCategoryIds = @Html.Raw(Json.Serialize(Model.SubCategoryIds));
+
+        function updateSubCategories() {
+            const parentCategoryId = document.getElementById("ParentCategoryId").value;
+            const subCategoriesTable = document.getElementById("subCategoriesTable");
+            subCategoriesTable.innerHTML = "";
+
+            // Display subcategories, excluding the selected parent category
+            subCategoriesData.forEach(category => {
+                if (category.id != parentCategoryId) {
+                    const tr = document.createElement("tr");
+                    tr.className = "subcategory-item";
+                    const isChecked = selectedSubCategoryIds.includes(category.id) ? "checked" : "";
+                    tr.innerHTML = `
+                        <td class="text-left subcategory-name">
+                            <div class="form-check mb-0">
+                                <input type="checkbox" name="SubCategoryIds" value="${category.id}" class="form-check-input" ${isChecked} />
+                                <label class="form-check-label">${category.name}</label>
+                            </div>
+                        </td>
+                    `;
+                    subCategoriesTable.appendChild(tr);
+                }
+            });
+        }
+    </script>
+}

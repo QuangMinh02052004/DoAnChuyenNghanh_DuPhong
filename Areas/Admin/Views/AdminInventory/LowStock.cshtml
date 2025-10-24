@@ -1,0 +1,216 @@
+﻿@model IEnumerable<Bloomie.Models.Entities.FlowerType>
+
+@{
+    ViewData["Title"] = "Hoa tươi tồn kho thấp";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid mt-2 p-0">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <!-- Header -->
+            <h2 class="mb-4 fw-bold">
+                <i class="fas fa-exclamation-triangle me-2"></i> Hoa tươi tồn kho thấp
+            </h2>
+
+            <!-- Success/Error Messages -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+            }
+
+            <!-- Low Stock Table -->
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered mb-0">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th class="col-flower-name">Tên loại hoa</th>
+                                <th class="col-quantity">Số lượng</th>
+                                <th class="col-actions">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var flowerType in Model)
+                            {
+                                <tr>
+                                    <td class="flower-name-cell">@flowerType.Name</td>
+                                    <td>@flowerType.Quantity</td>
+                                    <td class="actions-cell">
+                                        <a asp-action="ImportFlower" asp-route-flowerTypeId="@flowerType.Id" asp-route-currentPage="1" class="btn btn-primary btn-sm" data-bs-toggle="tooltip" data-bs-title="Nhập kho">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
+                                        <a asp-action="Adjust" asp-route-flowerTypeId="@flowerType.Id" asp-route-currentPage="1" class="btn btn-warning btn-sm" data-bs-toggle="tooltip" data-bs-title="Điều chỉnh">
+                                            <i class="fas fa-adjust"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">Không có loại hoa nào dưới ngưỡng tồn kho thấp (10).</p>
+            }
+
+            <!-- Back Button -->
+            <div class="mt-4">
+                <a asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #60a5fa;
+        --text-dark: #1e293b;
+        --text-light: #ffffff;
+        --background-light: #f8fafc;
+        --text-muted: #6b7280;
+    }
+
+    h2 {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .card {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #ffffff;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .table {
+        background-color: #ffffff;
+        border-radius: 8px;
+        table-layout: fixed;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+        .table th, .table td {
+            border-color: #e5e7eb;
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    .table-bordered td.flower-name-cell {
+        text-align: left !important;
+    }
+
+    .col-flower-name {
+        width: 50%;
+        min-width: 200px;
+    }
+
+    .col-quantity {
+        width: 20%;
+        min-width: 150px;
+    }
+
+    .col-actions {
+        width: 30%;
+        min-width: 180px;
+    }
+
+    .flower-name-cell {
+        white-space: normal;
+        overflow-wrap: break-word;
+        max-width: 100%;
+        line-height: 1.4;
+    }
+
+    .actions-cell {
+        white-space: nowrap;
+    }
+
+    .btn-primary, .btn-warning {
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        min-width: 32px;
+        transition: all 0.2s ease;
+        margin-right: 4px;
+    }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+    .btn-warning {
+        background-color: #f59e0b;
+        border-color: #f59e0b;
+    }
+
+        .btn-warning:hover {
+            background-color: #d97706;
+            transform: translateY(-1px);
+        }
+
+    .btn-outline-secondary {
+        border-color: #6b7280;
+        color: #6b7280;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #4b5563;
+            border-color: #4b5563;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize Bootstrap tooltips
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    });
+</script>
