@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Bloomie.csproj": {}
+    "/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie.csproj": {}
   },
   "projects": {
-    "/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Bloomie.csproj": {
+    "/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Bloomie.csproj",
+        "projectUniqueName": "/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie.csproj",
         "projectName": "Bloomie",
-        "projectPath": "/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/Bloomie.csproj",
+        "projectPath": "/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie.csproj",
         "packagesPath": "/Users/lequangminh/.nuget/packages/",
-        "outputPath": "/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/Bloomie 6/Bloomie/obj/",
+        "outputPath": "/Users/lequangminh/Documents/DoAnChuyenNghanh_DuPhong/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/lequangminh/.nuget/NuGet/NuGet.Config"
